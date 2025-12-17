@@ -102,6 +102,7 @@ export function sanitizeProjectName(name: string): string {
 
 export function isValidDirectoryName(name: string): boolean {
   // Check for invalid characters in directory names
+  // eslint-disable-next-line no-control-regex
   const invalidChars = /[<>:"/\\|?*\x00-\x1f]/;
   return !invalidChars.test(name) && name !== '.' && name !== '..';
 }

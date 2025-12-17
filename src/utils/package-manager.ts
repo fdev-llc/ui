@@ -8,17 +8,23 @@ export function detectPackageManager(): PackageManager {
   try {
     execSync('pnpm --version', { stdio: 'ignore' });
     return 'pnpm';
-  } catch {}
+  } catch (error) {
+    // Ignore error
+  }
 
   try {
     execSync('yarn --version', { stdio: 'ignore' });
     return 'yarn';
-  } catch {}
+  } catch (error) {
+    // Ignore error
+  }
 
   try {
     execSync('bun --version', { stdio: 'ignore' });
     return 'bun';
-  } catch {}
+  } catch (error) {
+    // Ignore error
+  }
 
   return 'npm';
 }
