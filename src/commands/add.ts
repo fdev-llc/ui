@@ -102,7 +102,7 @@ export async function addCommand(
     );
 
     // Handle conflicts more granularly
-    let componentsToSkip = new Set<string>();
+    const componentsToSkip = new Set<string>();
     let shouldOverwriteAll = options.overwrite || false;
 
     if (conflicts.length > 0 && !shouldOverwriteAll) {
@@ -264,16 +264,23 @@ export async function addCommand(
     }
 
     // Install hook dependencies
-    await installHookDependencies(finalHookDependencies, projectPath, {
-      ...options,
-      overwrite: shouldOverwriteAll,
-    });
+    await installAuxiliaryDependency(
+      finalHookDependencies,
+      'hooks',
+      projectPath,
+      options
+    );
 
     // Install theme dependencies
-    await installThemeDependencies(finalThemeDependencies, projectPath, {
-      ...options,
-      overwrite: shouldOverwriteAll,
-    });
+    await installAuxiliaryDependency(
+      finalThemeDependencies,
+      'theme',
+      projectPath,
+      options
+    );
+
+
+
 
     // Install components
     const spinner = ora('Installing components...').start();
@@ -379,94 +386,55 @@ function getPackageManager(options: AddCommandOptions) {
   return detectPackageManagerFromInvocation();
 }
 
-async function installHookDependencies(
-  hooks: string[],
+async function installAuxiliaryDependency(
+  items: string[],
+  type: 'hooks' | 'theme',
   projectPath: string,
   options: AddCommandOptions
 ): Promise<void> {
-  if (hooks.length === 0) return;
+  if (items.length === 0) return;
 
-  const hooksDir = path.join(projectPath, 'hooks');
-  await createDirectory(hooksDir);
+  const targetDir = path.join(projectPath, type);
+  await createDirectory(targetDir);
 
-  for (const hookName of hooks) {
-    const hookPath = path.join(hooksDir, `${hookName}.ts`);
+  for (const itemName of items) {
+    const itemPath = path.join(targetDir, `${itemName}.ts`);
 
-    if ((await fileExists(hookPath)) && !options.overwrite) {
+    if ((await fileExists(itemPath)) && !options.overwrite) {
       if (!options.yes) {
         const { shouldOverwrite } = await inquirer.prompt([
           {
             type: 'confirm',
             name: 'shouldOverwrite',
-            message: `Hook ${hookName} already exists. Overwrite?`,
+            message: `${
+              type === 'hooks' ? 'Hook' : 'Theme'
+            } ${itemName} already exists. Overwrite?`,
             default: false,
           },
         ]);
 
         if (!shouldOverwrite) {
-          logger.info(`Skipping hook: ${hookName}`);
+          logger.info(`Skipping ${type === 'hooks' ? 'hook' : 'theme'}: ${itemName}`);
           continue;
         }
       } else {
-        logger.info(`Skipping existing hook: ${hookName}`);
+        logger.info(`Skipping existing ${type === 'hooks' ? 'hook' : 'theme'}: ${itemName}`);
         continue;
       }
     }
 
     try {
-      const hookTemplate = await getComponentTemplate(
-        `templates/hooks/${hookName}.ts`
+      const templatePath = `templates/${type}/${itemName}.ts`;
+      const template = await getComponentTemplate(templatePath);
+      await writeFile(itemPath, template);
+      logger.success(
+        `Added ${type === 'hooks' ? 'hook' : 'theme'}: ${itemName}`
       );
-      await writeFile(hookPath, hookTemplate);
-      logger.success(`Added hook: ${hookName}`);
     } catch (error) {
-      logger.warn(`Failed to install hook ${hookName}:`, error);
-    }
-  }
-}
-
-async function installThemeDependencies(
-  themes: string[],
-  projectPath: string,
-  options: AddCommandOptions
-): Promise<void> {
-  if (themes.length === 0) return;
-
-  const themeDir = path.join(projectPath, 'theme');
-  await createDirectory(themeDir);
-
-  for (const themeName of themes) {
-    const themePath = path.join(themeDir, `${themeName}.ts`);
-
-    if ((await fileExists(themePath)) && !options.overwrite) {
-      if (!options.yes) {
-        const { shouldOverwrite } = await inquirer.prompt([
-          {
-            type: 'confirm',
-            name: 'shouldOverwrite',
-            message: `Theme ${themeName} already exists. Overwrite?`,
-            default: false,
-          },
-        ]);
-
-        if (!shouldOverwrite) {
-          logger.info(`Skipping theme: ${themeName}`);
-          continue;
-        }
-      } else {
-        logger.info(`Skipping existing theme: ${themeName}`);
-        continue;
-      }
-    }
-
-    try {
-      const themeTemplate = await getComponentTemplate(
-        `templates/theme/${themeName}.ts`
+      logger.warn(
+        `Failed to install ${type === 'hooks' ? 'hook' : 'theme'} ${itemName}:`,
+        error
       );
-      await writeFile(themePath, themeTemplate);
-      logger.success(`Added theme: ${themeName}`);
-    } catch (error) {
-      logger.warn(`Failed to install theme ${themeName}:`, error);
     }
   }
 }
