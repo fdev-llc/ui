@@ -10,7 +10,8 @@ import {
   validateProjectPath,
   sanitizeProjectName,
 } from '../utils/validation.js';
-import { copyTemplate, replaceInFile } from '../utils/filesystem.js';
+import { copyTemplate } from '../utils/filesystem.js';
+import { updatePackageJson, updateAppJson } from '../utils/project-config.js';
 import {
   detectPackageManagerFromInvocation,
   installDependencies,
@@ -205,64 +206,7 @@ export async function initCommand(
   }
 }
 
-async function updatePackageJson(
-  projectPath: string,
-  projectName: string
-): Promise<void> {
-  const packageJsonPath = path.join(projectPath, 'package.json');
 
-  try {
-    // Read the package.json file
-    const fileContent = fs.readFileSync(packageJsonPath, 'utf-8');
-
-    // Parse the JSON content into a JavaScript object
-    const packageJson = JSON.parse(fileContent);
-
-    // Update the 'name' property
-    packageJson.name = projectName;
-
-    // Convert the object back to a nicely formatted JSON string
-    const updatedContent = JSON.stringify(packageJson, null, 2);
-
-    // Write the updated content back to the file
-    fs.writeFileSync(packageJsonPath, updatedContent, 'utf-8');
-  } catch (error) {
-    logger.error(`Failed to update package.json for project: ${projectName}`);
-    logger.debug(error as string);
-    throw new Error('Could not update package.json.');
-  }
-}
-
-async function updateAppJson(
-  projectPath: string,
-  projectName: string
-): Promise<void> {
-  const appJsonPath = path.join(projectPath, 'app.json');
-
-  try {
-    // Read the file content
-    const fileContent = fs.readFileSync(appJsonPath, 'utf-8');
-
-    // Parse the JSON into a JavaScript object
-    const appConfig = JSON.parse(fileContent);
-
-    // Modify the desired properties within the 'expo' object
-    appConfig.expo.name = projectName;
-    appConfig.expo.slug = projectName;
-    appConfig.expo.scheme = projectName;
-
-    // Convert the modified object back to a formatted JSON string
-    const updatedContent = JSON.stringify(appConfig, null, 2);
-
-    // Write the updated content back to the file
-    fs.writeFileSync(appJsonPath, updatedContent, 'utf-8');
-  } catch (error) {
-    logger.error(`Failed to update app.json for project: ${projectName}`);
-    logger.debug(error as string);
-    // Re-throw the error to stop the initialization process if app.json is crucial
-    throw new Error('Could not update app.json.');
-  }
-}
 
 function showSuccessMessage(
   projectName: string,
