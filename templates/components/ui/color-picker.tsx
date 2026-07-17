@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react"
-import { Dimensions, Modal, StyleSheet, TouchableOpacity, ViewStyle } from "react-native"
+import { Modal, StyleSheet, TouchableOpacity, useWindowDimensions, ViewStyle } from "react-native"
 import { LinearGradient as ExpoLinearGradient } from "expo-linear-gradient"
 import { Gesture, GestureDetector } from "react-native-gesture-handler"
 import Animated, { runOnJS, useAnimatedStyle, useSharedValue } from "react-native-reanimated"
@@ -10,8 +10,6 @@ import { View } from "@/components/ui/view"
 import { useColor } from "@/hooks/useColor"
 import { CORNERS, HEIGHT, RADIUS } from "@/theme/globals"
 
-const { width: screenWidth } = Dimensions.get("window")
-const PICKER_SIZE = screenWidth - 40
 const HUE_BAR_HEIGHT = 40
 const KNOB_SIZE = 40
 
@@ -148,6 +146,8 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
   disabled = false,
   style,
 }) => {
+  const { width: screenWidth } = useWindowDimensions()
+  const PICKER_SIZE = screenWidth - 40
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [currentColor, setCurrentColor] = useState(value)
   const [pureHueColor, setPureHueColor] = useState("#ff0000")
@@ -286,14 +286,19 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
               <GestureDetector gesture={pickerGesture}>
                 <View style={{ width: PICKER_SIZE, height: PICKER_SIZE }}>
                   {/* Base color layer */}
-                  <View style={[styles.colorBase, { backgroundColor: pureHueColor }]} />
+                  <View
+                    style={[
+                      styles.colorBase,
+                      { width: PICKER_SIZE, height: PICKER_SIZE, backgroundColor: pureHueColor },
+                    ]}
+                  />
 
                   {/* Saturation gradient (white to transparent, left to right) */}
                   <ExpoLinearGradient
                     colors={["rgba(255,255,255,1)", "rgba(255,255,255,0)"]}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 0 }}
-                    style={styles.gradientLayer}
+                    style={[styles.gradientLayer, { width: PICKER_SIZE, height: PICKER_SIZE }]}
                   />
 
                   {/* Brightness gradient (transparent to black, top to bottom) */}
@@ -301,7 +306,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
                     colors={["rgba(0,0,0,0)", "rgba(0,0,0,1)"]}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 0, y: 1 }}
-                    style={styles.gradientLayer}
+                    style={[styles.gradientLayer, { width: PICKER_SIZE, height: PICKER_SIZE }]}
                   />
 
                   <Animated.View style={[styles.pickerKnob, pickerKnobStyle]} />
@@ -342,9 +347,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
 const styles = StyleSheet.create({
   colorBase: {
     borderRadius: RADIUS["lg"],
-    height: PICKER_SIZE,
     position: "absolute",
-    width: PICKER_SIZE,
   },
   content: {
     alignItems: "center",
@@ -353,9 +356,7 @@ const styles = StyleSheet.create({
   },
   gradientLayer: {
     borderRadius: 12,
-    height: PICKER_SIZE,
     position: "absolute",
-    width: PICKER_SIZE,
   },
   header: {
     alignItems: "center",

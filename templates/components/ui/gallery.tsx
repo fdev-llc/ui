@@ -1,5 +1,13 @@
 import { memo, useCallback, useEffect, useRef, useState } from "react"
-import { Dimensions, FlatList, Modal, Pressable, ScrollView, StyleSheet, View } from "react-native"
+import {
+  FlatList,
+  Modal,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  useWindowDimensions,
+  View,
+} from "react-native"
 import { Image } from "expo-image"
 import { Download, Share, X } from "lucide-react-native"
 import { Gesture, GestureDetector, GestureHandlerRootView } from "react-native-gesture-handler"
@@ -14,8 +22,6 @@ import { Button } from "@/components/ui/button"
 import { Text } from "@/components/ui/text"
 import { useColor } from "@/hooks/useColor"
 import { RADIUS } from "@/theme/globals"
-
-const { width: screenWidth, height: screenHeight } = Dimensions.get("window")
 
 export interface GalleryItem {
   id: string
@@ -58,6 +64,8 @@ export const useImageZoom = ({
   onSetCanSwipe,
   shouldReset = false,
 }: UseImageZoomProps) => {
+  const { width: screenWidth, height: screenHeight } = useWindowDimensions()
+
   // Shared values for animated properties
   const scale = useSharedValue(1)
   const translateX = useSharedValue(0)
@@ -298,6 +306,7 @@ interface FullscreenImageProps {
 
 const FullscreenImage = memo(
   ({ item, index, selectedIndex, enableZoom, onSetCanSwipe }: FullscreenImageProps) => {
+    const { width: screenWidth, height: screenHeight } = useWindowDimensions()
     // Determine if this image is the currently selected one to trigger zoom reset
     const shouldReset = index === selectedIndex
     const backgroundColor = useColor("background")
@@ -320,20 +329,20 @@ const FullscreenImage = memo(
         {/* GestureDetector always present if zoom is enabled */}
         {enableZoom ? (
           <GestureDetector gesture={composedGesture}>
-            <Animated.View style={styles.imageContainer}>
+            <Animated.View style={[styles.imageContainer, { width: screenWidth, height: screenHeight }]}>
               <AnimatedImage
                 source={{ uri: item.uri }}
-                style={[styles.fullscreenImage, animatedImageStyle]}
+                style={[styles.fullscreenImage, { width: screenWidth, height: screenHeight }, animatedImageStyle]}
                 contentFit="contain"
               />
             </Animated.View>
           </GestureDetector>
         ) : (
           // If zoom is not enabled, render without GestureDetector
-          <Animated.View style={styles.imageContainer}>
+          <Animated.View style={[styles.imageContainer, { width: screenWidth, height: screenHeight }]}>
             <AnimatedImage
               source={{ uri: item.uri }}
-              style={[styles.fullscreenImage, animatedImageStyle]}
+              style={[styles.fullscreenImage, { width: screenWidth, height: screenHeight }, animatedImageStyle]}
               contentFit="contain"
             />
           </Animated.View>
@@ -361,6 +370,7 @@ export function Gallery({
   onShare,
   renderCustomOverlay,
 }: GalleryProps) {
+  const { width: screenWidth } = useWindowDimensions()
   // State for the currently selected image index in fullscreen mode
   const [selectedIndex, setSelectedIndex] = useState<number>(-1)
   // State to control modal visibility
@@ -755,10 +765,7 @@ const styles = StyleSheet.create({
     // Ensure controls don't block interaction with the image itself unless explicitly on a button
     pointerEvents: "box-none",
   },
-  fullscreenImage: {
-    height: screenHeight,
-    width: screenWidth,
-  },
+  fullscreenImage: {},
   grid: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -769,9 +776,7 @@ const styles = StyleSheet.create({
   imageContainer: {
     alignItems: "center",
     flex: 1,
-    height: screenHeight,
     justifyContent: "center",
-    width: screenWidth,
   },
   itemInfo: {
     padding: 8,

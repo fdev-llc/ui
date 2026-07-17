@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react"
-import { Dimensions, ScrollView, StyleSheet, View, ViewStyle } from "react-native"
+import { ScrollView, StyleSheet, useWindowDimensions, View, ViewStyle } from "react-native"
 import { Gesture, GestureDetector } from "react-native-gesture-handler"
 import Animated, {
   runOnJS,
@@ -11,8 +11,6 @@ import Animated, {
 import { Button } from "@/components/ui/button"
 import { Text } from "@/components/ui/text"
 import { useColor } from "@/hooks/useColor"
-
-const { width: screenWidth } = Dimensions.get("window")
 
 export interface OnboardingStep {
   id: string
@@ -59,6 +57,7 @@ export function Onboarding({
   style,
   children,
 }: OnboardingProps) {
+  const { width: screenWidth } = useWindowDimensions()
   const [currentStep, setCurrentStep] = useState(0)
   const scrollViewRef = useRef<ScrollView>(null)
   const translateX = useSharedValue(0)
@@ -158,6 +157,7 @@ export function Onboarding({
         key={step.id}
         style={[
           styles.stepContainer,
+          { width: screenWidth },
           { backgroundColor: step.backgroundColor || backgroundColor },
           { opacity: isActive ? 1 : 0.8 },
         ]}
@@ -291,7 +291,6 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   stepContainer: {
-    width: screenWidth,
     flex: 1,
     justifyContent: "center",
     alignItems: "center",

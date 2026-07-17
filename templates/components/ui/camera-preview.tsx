@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Alert, Dimensions, StyleSheet, TouchableOpacity } from "react-native"
+import { Alert, StyleSheet, TouchableOpacity, useWindowDimensions } from "react-native"
 import * as MediaLibrary from "expo-media-library"
 import { Download, Upload, X } from "lucide-react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
@@ -12,9 +12,8 @@ import { Video } from "@/components/ui/video"
 import { View } from "@/components/ui/view"
 import { useColor } from "@/hooks/useColor"
 
-const { width: screenWidth } = Dimensions.get("window")
-
 export function CameraPreview() {
+  const { width: screenWidth } = useWindowDimensions()
   const [showCamera, setShowCamera] = useState(false)
   const [cameraHeight, setCameraHeight] = useState((screenWidth * 4) / 3)
   const [capturedMedia, setCapturedMedia] = useState<{
@@ -143,7 +142,7 @@ export function CameraPreview() {
   if (showPreview && capturedMedia) {
     return (
       <SafeAreaView style={[styles.container, { backgroundColor }]}>
-        <View style={[styles.previewContainer, { height: cameraHeight }]}>
+        <View style={[styles.previewContainer, { width: screenWidth, height: cameraHeight }]}>
           {capturedMedia.type === "picture" && capturedMedia.uri ? (
             <Image source={{ uri: capturedMedia.uri }} />
           ) : (
@@ -327,7 +326,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 0,
     overflow: "hidden",
     position: "relative",
-    width: screenWidth,
   },
   previewMedia: {
     height: "100%",

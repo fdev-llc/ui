@@ -2,9 +2,9 @@ import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } f
 import {
   ActivityIndicator,
   Alert,
-  Dimensions,
   StyleSheet,
   TouchableOpacity,
+  useWindowDimensions,
   View,
   ViewStyle,
 } from "react-native"
@@ -40,8 +40,6 @@ import { Progress } from "@/components/ui/progress"
 import { Text } from "@/components/ui/text"
 import { useColor } from "@/hooks/useColor"
 import { FONT_SIZE, RADIUS } from "@/theme/globals"
-
-const { width: screenWidth } = Dimensions.get("window")
 
 const AnimatedCameraView = Animated.createAnimatedComponent(CameraView)
 
@@ -88,6 +86,7 @@ export const Camera = forwardRef<CameraRef, CameraProps>(
     ref,
   ) => {
     const cameraRef = useRef<CameraView>(null)
+    const { width: screenWidth } = useWindowDimensions()
     const recordingInterval = useRef<ReturnType<typeof setInterval> | null>(null)
     const timerInterval = useRef<ReturnType<typeof setInterval> | null>(null)
 
@@ -396,7 +395,7 @@ export const Camera = forwardRef<CameraRef, CameraProps>(
 
     return (
       <Animated.View style={[styles.container, { backgroundColor }, style, animatedContainerStyle]}>
-        <View style={[styles.cameraContainer, { height: getCameraHeight() }]}>
+        <View style={[styles.cameraContainer, { width: screenWidth, height: getCameraHeight() }]}>
           <GestureDetector gesture={composedGestures}>
             <AnimatedCameraView
               ref={cameraRef}
@@ -669,7 +668,6 @@ const styles = StyleSheet.create({
   cameraContainer: {
     borderRadius: RADIUS["lg"],
     overflow: "hidden",
-    width: screenWidth,
   },
   cancelTimerButton: {
     alignItems: "center",

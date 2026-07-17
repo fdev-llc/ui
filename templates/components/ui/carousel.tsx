@@ -7,10 +7,10 @@ import React, {
   useState,
 } from "react"
 import {
-  Dimensions,
   NativeScrollEvent,
   NativeSyntheticEvent,
   ScrollView,
+  useWindowDimensions,
   TouchableOpacity,
   ViewStyle,
 } from "react-native"
@@ -22,7 +22,6 @@ import { View } from "@/components/ui/view"
 import { useColor } from "@/hooks/useColor"
 import { RADIUS } from "@/theme/globals"
 
-const { width: screenWidth } = Dimensions.get("window")
 
 interface CarouselProps {
   children: React.ReactNode[]
@@ -87,6 +86,7 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
     ref,
   ) => {
     const scrollViewRef = useRef<ScrollView>(null)
+    const { width: screenWidth } = useWindowDimensions()
     const [currentIndex, setCurrentIndex] = useState(0)
     const [containerWidth, setContainerWidth] = useState(screenWidth)
     const [isUserInteracting, setIsUserInteracting] = useState(false)

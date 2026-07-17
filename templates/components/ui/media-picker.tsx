@@ -1,12 +1,12 @@
 import React, { forwardRef, useEffect, useRef, useState } from "react"
 import {
-  Dimensions,
   FlatList,
   Modal,
   Pressable,
   View as RNView,
   StyleSheet,
   TouchableOpacity,
+  useWindowDimensions,
   ViewStyle,
 } from "react-native"
 import { Image as ExpoImage } from "expo-image"
@@ -55,7 +55,6 @@ export interface MediaPickerProps {
   onError?: (error: string) => void
 }
 
-const { width: screenWidth } = Dimensions.get("window")
 
 // Helper function to compare arrays of MediaAssets
 const arraysEqual = (a: MediaAsset[], b: MediaAsset[]): boolean => {
@@ -89,6 +88,7 @@ export const MediaPicker = forwardRef<RNView, MediaPickerProps>(
     },
     ref,
   ) => {
+    const { width: screenWidth } = useWindowDimensions()
     const [assets, setAssets] = useState<MediaAsset[]>(selectedAssets)
     const [isGalleryVisible, setIsGalleryVisible] = useState(false)
     const [galleryAssets, setGalleryAssets] = useState<MediaLibrary.Asset[]>([])

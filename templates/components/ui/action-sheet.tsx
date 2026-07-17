@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react"
 import {
   ActionSheetIOS,
-  Dimensions,
   Modal,
   Platform,
   Pressable,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
+  useWindowDimensions,
   ViewStyle,
 } from "react-native"
 import Animated, {
@@ -114,7 +114,7 @@ function AndroidActionSheet({
 }: ActionSheetProps) {
   const [isSheetVisible, setIsSheetVisible] = useState(visible)
   const progress = useSharedValue(0)
-  const screenHeight = Dimensions.get("window").height
+  const { height: screenHeight } = useWindowDimensions()
 
   const cardColor = useColor("card")
   const textColor = useColor("text")

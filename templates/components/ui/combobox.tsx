@@ -10,7 +10,6 @@ import React, {
   useState,
 } from "react"
 import {
-  Dimensions,
   Modal,
   Pressable,
   ScrollView,
@@ -19,6 +18,7 @@ import {
   TextInput,
   TextStyle,
   TouchableOpacity,
+  useWindowDimensions,
   View,
   ViewStyle,
 } from "react-native"
@@ -246,7 +246,7 @@ export function ComboboxContent({ children, maxHeight = 400 }: ComboboxContentPr
     setSearchQuery("")
   }
 
-  const screenHeight = Dimensions.get("window").height
+  const { height: screenHeight } = useWindowDimensions()
   const availableHeight = screenHeight - triggerLayout.y - triggerLayout.height - 100
   const dropdownHeight = Math.min(maxHeight, availableHeight)
 

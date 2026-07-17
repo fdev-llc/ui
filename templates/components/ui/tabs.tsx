@@ -1,5 +1,11 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react"
-import { Dimensions, ScrollView, TextStyle, TouchableOpacity, ViewStyle } from "react-native"
+import {
+  ScrollView,
+  TextStyle,
+  TouchableOpacity,
+  useWindowDimensions,
+  ViewStyle,
+} from "react-native"
 import { Gesture, GestureDetector } from "react-native-gesture-handler"
 import Animated, {
   Extrapolate,
@@ -14,8 +20,6 @@ import { Text } from "@/components/ui/text"
 import { View } from "@/components/ui/view"
 import { useColor } from "@/hooks/useColor"
 import { CORNERS, FONT_SIZE, HEIGHT, RADIUS } from "@/theme/globals"
-
-const { width: screenWidth } = Dimensions.get("window")
 
 // Types
 interface TabsContextType {
@@ -208,6 +212,7 @@ function CarouselContainer({
   onSwipe: (direction: "next" | "prev") => void
   style?: ViewStyle
 }) {
+  const { width: screenWidth } = useWindowDimensions()
   const translateX = useSharedValue(0)
   const isGestureActive = useSharedValue(false)
   const currentIndex = tabValues.indexOf(activeTab)

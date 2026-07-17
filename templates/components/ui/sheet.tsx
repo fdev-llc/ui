@@ -1,11 +1,11 @@
 import React, { useEffect } from "react"
 import {
-  Dimensions,
   Modal,
   Platform,
   Pressable,
   StyleSheet,
   TouchableOpacity,
+  useWindowDimensions,
   ViewStyle,
 } from "react-native"
 import { X } from "lucide-react-native"
@@ -24,7 +24,6 @@ import { View } from "@/components/ui/view"
 import { useColor } from "@/hooks/useColor"
 import { FONT_SIZE, RADIUS } from "@/theme/globals"
 
-const { width: SCREEN_WIDTH } = Dimensions.get("window")
 
 type SheetSide = "left" | "right"
 
@@ -100,7 +99,8 @@ export function SheetTrigger({ children, asChild }: SheetTriggerProps) {
 
 export function SheetContent({ children, style }: SheetContentProps) {
   const { open, onOpenChange, side } = useSheet()
-  const sheetWidth = Math.min(SCREEN_WIDTH * 0.8, 400)
+  const { width: screenWidth } = useWindowDimensions()
+  const sheetWidth = Math.min(screenWidth * 0.8, 400)
   const [isVisible, setIsVisible] = React.useState(open)
 
   const backgroundColor = useColor("background")

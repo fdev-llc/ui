@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react"
-import { Dimensions, Platform, TouchableOpacity, View, ViewStyle } from "react-native"
+import { Platform, TouchableOpacity, useWindowDimensions, View, ViewStyle } from "react-native"
 import { AlertCircle, Check, Info, X } from "lucide-react-native"
 import { Gesture, GestureDetector, GestureHandlerRootView } from "react-native-gesture-handler"
 import Animated, {
@@ -32,12 +32,10 @@ interface ToastProps extends ToastData {
   index: number
 }
 
-const { width: screenWidth } = Dimensions.get("window")
 const DYNAMIC_ISLAND_HEIGHT = 37
 const EXPANDED_HEIGHT = 85
 const TOAST_MARGIN = 8
 const DYNAMIC_ISLAND_WIDTH = 126
-const EXPANDED_WIDTH = screenWidth - 32
 
 // Reanimated spring configuration
 const SPRING_CONFIG = {
@@ -67,6 +65,9 @@ export function Toast({
   const contentOpacity = useSharedValue(0)
 
   // Dynamic Island colors (dark theme optimized)
+  const { width: screenWidth } = useWindowDimensions()
+  const expandedWidth = screenWidth - 32
+
   const backgroundColor = "#1C1C1E" // iOS Dynamic Island background
   const mutedTextColor = "#8E8E93" // iOS secondary text color
 
@@ -75,7 +76,7 @@ export function Toast({
 
     if (hasContentToShow) {
       // If there's content, start directly with expanded state
-      width.value = EXPANDED_WIDTH
+      width.value = expandedWidth
       height.value = EXPANDED_HEIGHT
       borderRadius.value = 20
       setIsExpanded(true)

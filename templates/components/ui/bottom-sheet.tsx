@@ -1,5 +1,11 @@
 import React, { useEffect } from "react"
-import { Dimensions, Modal, ScrollView, TouchableWithoutFeedback, ViewStyle } from "react-native"
+import {
+  Modal,
+  ScrollView,
+  TouchableWithoutFeedback,
+  useWindowDimensions,
+  ViewStyle,
+} from "react-native"
 import { Gesture, GestureDetector, GestureHandlerRootView } from "react-native-gesture-handler"
 import Animated, {
   runOnJS,
@@ -14,9 +20,6 @@ import { View } from "@/components/ui/view"
 import { useColor } from "@/hooks/useColor"
 import { useKeyboardHeight } from "@/hooks/useKeyboardHeight" // Make sure this path is correct
 import { RADIUS } from "@/theme/globals"
-
-const { height: SCREEN_HEIGHT } = Dimensions.get("window")
-const MAX_TRANSLATE_Y = -SCREEN_HEIGHT + 50
 
 type BottomSheetContentProps = {
   children: React.ReactNode
@@ -39,14 +42,16 @@ const BottomSheetContent = ({
   mutedColor,
   onHandlePress,
 }: BottomSheetContentProps) => {
+  const { height: screenHeight } = useWindowDimensions()
+
   return (
     <Animated.View
       style={[
         {
-          height: SCREEN_HEIGHT,
+          height: screenHeight,
           width: "100%",
           position: "absolute",
-          top: SCREEN_HEIGHT,
+          top: screenHeight,
           backgroundColor: cardColor,
           borderTopLeftRadius: RADIUS["4xl"],
           borderTopRightRadius: RADIUS["4xl"],
@@ -126,6 +131,8 @@ export function BottomSheet({
 }: BottomSheetProps) {
   const cardColor = useColor("card")
   const mutedColor = useColor("muted")
+  const { height: screenHeight } = useWindowDimensions()
+  const maxTranslateY = -screenHeight + 50
   const { keyboardHeight, isKeyboardVisible } = useKeyboardHeight()
 
   const translateY = useSharedValue(0)
@@ -135,7 +142,7 @@ export function BottomSheet({
   // Shared value to hold keyboard height for use in worklets
   const keyboardHeightSV = useSharedValue(0)
 
-  const snapPointsHeights = snapPoints.map((point) => -SCREEN_HEIGHT * point)
+  const snapPointsHeights = snapPoints.map((point) => -screenHeight * point)
   const defaultHeight = snapPointsHeights[0]
 
   const [modalVisible, setModalVisible] = React.useState(false)
@@ -233,7 +240,7 @@ export function BottomSheet({
     })
     .onUpdate((event) => {
       const newY = context.value.y + event.translationY
-      if (newY <= 0 && newY >= MAX_TRANSLATE_Y) {
+      if (newY <= 0 && newY >= maxTranslateY) {
         translateY.value = newY
       }
     })
@@ -241,7 +248,7 @@ export function BottomSheet({
       const currentY = translateY.value
       const velocity = event.velocityY
 
-      if (velocity > 500 && currentY > -SCREEN_HEIGHT * 0.2) {
+      if (velocity > 500 && currentY > -screenHeight * 0.2) {
         animateClose()
         return
       }
