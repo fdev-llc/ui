@@ -1,5 +1,6 @@
 import { TextStyle, ViewStyle } from "react-native"
 
+import { GlassSurface } from "@/components/ui/glass"
 import { Text } from "@/components/ui/text"
 import { View } from "@/components/ui/view"
 import { useColor } from "@/hooks/useColor"
@@ -11,7 +12,6 @@ interface CardProps {
 }
 
 export function Card({ children, style }: CardProps) {
-  const cardColor = useColor("card")
   const foregroundColor = useColor("foreground")
 
   return (
@@ -19,9 +19,7 @@ export function Card({ children, style }: CardProps) {
       style={[
         {
           width: "100%",
-          backgroundColor: cardColor,
           borderRadius: RADIUS["4xl"],
-          padding: 18,
           shadowColor: foregroundColor,
           shadowOffset: { width: 0, height: 2 },
           shadowOpacity: 0.05,
@@ -31,7 +29,9 @@ export function Card({ children, style }: CardProps) {
         style,
       ]}
     >
-      {children}
+      <GlassSurface tier="soft" style={{ borderRadius: RADIUS["4xl"], padding: 18 }}>
+        {children}
+      </GlassSurface>
     </View>
   )
 }

@@ -329,20 +329,32 @@ const FullscreenImage = memo(
         {/* GestureDetector always present if zoom is enabled */}
         {enableZoom ? (
           <GestureDetector gesture={composedGesture}>
-            <Animated.View style={[styles.imageContainer, { width: screenWidth, height: screenHeight }]}>
+            <Animated.View
+              style={[styles.imageContainer, { width: screenWidth, height: screenHeight }]}
+            >
               <AnimatedImage
                 source={{ uri: item.uri }}
-                style={[styles.fullscreenImage, { width: screenWidth, height: screenHeight }, animatedImageStyle]}
+                style={[
+                  styles.fullscreenImage,
+                  { width: screenWidth, height: screenHeight },
+                  animatedImageStyle,
+                ]}
                 contentFit="contain"
               />
             </Animated.View>
           </GestureDetector>
         ) : (
           // If zoom is not enabled, render without GestureDetector
-          <Animated.View style={[styles.imageContainer, { width: screenWidth, height: screenHeight }]}>
+          <Animated.View
+            style={[styles.imageContainer, { width: screenWidth, height: screenHeight }]}
+          >
             <AnimatedImage
               source={{ uri: item.uri }}
-              style={[styles.fullscreenImage, { width: screenWidth, height: screenHeight }, animatedImageStyle]}
+              style={[
+                styles.fullscreenImage,
+                { width: screenWidth, height: screenHeight },
+                animatedImageStyle,
+              ]}
               contentFit="contain"
             />
           </Animated.View>

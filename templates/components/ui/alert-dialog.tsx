@@ -9,14 +9,13 @@ import Animated, {
 
 import { Button } from "@/components/ui/button"
 import {
-  Card,
   CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { useColor } from "@/hooks/useColor"
+import { GlassSurface } from "@/components/ui/glass"
 import { RADIUS } from "@/theme/globals"
 
 export type AlertDialogProps = {
@@ -49,8 +48,6 @@ export function AlertDialog({
   showCancelButton = true,
   style,
 }: AlertDialogProps) {
-  const cardColor = useColor("card")
-
   const [modalVisible, setModalVisible] = React.useState(false)
   const backdropOpacity = useSharedValue(0)
   const cardOpacity = useSharedValue(0)
@@ -113,13 +110,10 @@ export function AlertDialog({
         </TouchableWithoutFeedback>
 
         {/* Non-animated outer wrapper: handles rounded corners and clipping */}
-        <View style={[styles.roundedWrapper, { backgroundColor: cardColor }, style]}>
+        <GlassSurface tier="strong" style={[styles.roundedWrapper, style]}>
           {/* Only fade the inner content */}
           <Animated.View style={[styles.innerContent, rCardFadeStyle]}>
-            <Card
-              // Card has no rounded corners, background or shadow (delegated to wrapper)
-              style={{ backgroundColor: "transparent", elevation: 0 }}
-            >
+            <View style={styles.body}>
               {(title || description) && (
                 <CardHeader>
                   {title ? <CardTitle>{title}</CardTitle> : null}
@@ -137,9 +131,9 @@ export function AlertDialog({
                   {confirmText}
                 </Button>
               </CardFooter>
-            </Card>
+            </View>
           </Animated.View>
-        </View>
+        </GlassSurface>
       </Animated.View>
     </Modal>
   )
@@ -169,6 +163,9 @@ const styles = StyleSheet.create({
   // Inner content can render freely (only opacity is animated)
   innerContent: {
     width: "100%",
+  },
+  body: {
+    padding: 18,
   },
 })
 

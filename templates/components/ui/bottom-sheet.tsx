@@ -2,6 +2,7 @@ import React, { useEffect } from "react"
 import {
   Modal,
   ScrollView,
+  StyleSheet,
   TouchableWithoutFeedback,
   useWindowDimensions,
   ViewStyle,
@@ -15,6 +16,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated"
 
+import { GlassSurface } from "@/components/ui/glass"
 import { Text } from "@/components/ui/text"
 import { View } from "@/components/ui/view"
 import { useColor } from "@/hooks/useColor"
@@ -26,7 +28,6 @@ type BottomSheetContentProps = {
   title?: string
   style?: ViewStyle
   rBottomSheetStyle: any
-  cardColor: string
   mutedColor: string
   onHandlePress?: () => void
 }
@@ -38,7 +39,6 @@ const BottomSheetContent = ({
   title,
   style,
   rBottomSheetStyle,
-  cardColor,
   mutedColor,
   onHandlePress,
 }: BottomSheetContentProps) => {
@@ -52,14 +52,16 @@ const BottomSheetContent = ({
           width: "100%",
           position: "absolute",
           top: screenHeight,
-          backgroundColor: cardColor,
           borderTopLeftRadius: RADIUS["4xl"],
           borderTopRightRadius: RADIUS["4xl"],
+          overflow: "hidden",
         },
         rBottomSheetStyle,
         style,
       ]}
     >
+      <GlassSurface tier="strong" style={StyleSheet.absoluteFill} />
+
       {/* Handle */}
       <TouchableWithoutFeedback onPress={onHandlePress}>
         <View
@@ -129,7 +131,6 @@ export function BottomSheet({
   style,
   disablePanGesture = false,
 }: BottomSheetProps) {
-  const cardColor = useColor("card")
   const mutedColor = useColor("muted")
   const { height: screenHeight } = useWindowDimensions()
   const maxTranslateY = -screenHeight + 50
@@ -292,7 +293,6 @@ export function BottomSheet({
               title={title}
               style={style}
               rBottomSheetStyle={rBottomSheetStyle}
-              cardColor={cardColor}
               mutedColor={mutedColor}
               onHandlePress={() => runOnJS(handlePress)()}
             />
@@ -303,7 +303,6 @@ export function BottomSheet({
                 title={title}
                 style={style}
                 rBottomSheetStyle={rBottomSheetStyle}
-                cardColor={cardColor}
                 mutedColor={mutedColor}
                 onHandlePress={() => runOnJS(handlePress)()}
               />

@@ -1,5 +1,12 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react"
-import { Platform, TouchableOpacity, useWindowDimensions, View, ViewStyle } from "react-native"
+import {
+  Platform,
+  StyleSheet,
+  TouchableOpacity,
+  useWindowDimensions,
+  View,
+  ViewStyle,
+} from "react-native"
 import { AlertCircle, Check, Info, X } from "lucide-react-native"
 import { Gesture, GestureDetector, GestureHandlerRootView } from "react-native-gesture-handler"
 import Animated, {
@@ -11,7 +18,9 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated"
 
+import { GlassSurface } from "@/components/ui/glass"
 import { Text } from "@/components/ui/text"
+import { useColor } from "@/hooks/useColor"
 
 export type ToastVariant = "default" | "success" | "error" | "warning" | "info"
 
@@ -64,12 +73,18 @@ export function Toast({
   const borderRadius = useSharedValue(18.5)
   const contentOpacity = useSharedValue(0)
 
-  // Dynamic Island colors (dark theme optimized)
   const { width: screenWidth } = useWindowDimensions()
   const expandedWidth = screenWidth - 32
 
-  const backgroundColor = "#1C1C1E" // iOS Dynamic Island background
-  const mutedTextColor = "#8E8E93" // iOS secondary text color
+  const mutedTextColor = useColor("mutedForeground")
+  const foregroundColor = useColor("foreground")
+  const successColor = useColor("statusSuccess")
+  const errorColor = useColor("statusError")
+  const warningColor = useColor("statusWarning")
+  const infoColor = useColor("statusInProgress")
+  // The action chip sits on a saturated status fill; this is the palette's
+  // near-white foreground intended for exactly that.
+  const onStatusFillColor = useColor("successForeground")
 
   useEffect(() => {
     const hasContentToShow = Boolean(title || description || action)
@@ -101,15 +116,15 @@ export function Toast({
   const getVariantColor = () => {
     switch (variant) {
       case "success":
-        return "#30D158" // iOS green
+        return successColor
       case "error":
-        return "#FF453A" // iOS red
+        return errorColor
       case "warning":
-        return "#FF9F0A" // iOS orange
+        return warningColor
       case "info":
-        return "#007AFF" // iOS blue
+        return infoColor
       default:
-        return "#8E8E93" // iOS gray
+        return mutedTextColor
     }
   }
 
@@ -194,7 +209,6 @@ export function Toast({
     width: width.value,
     height: height.value,
     borderRadius: borderRadius.value,
-    backgroundColor,
     justifyContent: "center",
     alignItems: "center",
     overflow: "hidden",
@@ -220,6 +234,8 @@ export function Toast({
     <GestureDetector gesture={panGesture}>
       <Animated.View style={[toastStyle, animatedContainerStyle]}>
         <Animated.View style={animatedIslandStyle}>
+          <GlassSurface tier="strong" style={StyleSheet.absoluteFill} />
+
           {/* Compact state - just icon or indicator */}
           {!isExpanded && (
             <View style={{ justifyContent: "center", alignItems: "center" }}>{getIcon()}</View>
@@ -250,7 +266,7 @@ export function Toast({
                   <Text
                     variant="subtitle"
                     style={{
-                      color: "#FFFFFF",
+                      color: foregroundColor,
                       fontSize: 15,
                       fontWeight: "600",
                       marginBottom: description ? 2 : 0,
@@ -291,7 +307,7 @@ export function Toast({
                   <Text
                     variant="caption"
                     style={{
-                      color: "#FFFFFF",
+                      color: onStatusFillColor,
                       fontSize: 12,
                       fontWeight: "600",
                     }}

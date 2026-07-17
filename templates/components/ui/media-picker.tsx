@@ -55,7 +55,6 @@ export interface MediaPickerProps {
   onError?: (error: string) => void
 }
 
-
 // Helper function to compare arrays of MediaAssets
 const arraysEqual = (a: MediaAsset[], b: MediaAsset[]): boolean => {
   if (a.length !== b.length) return false

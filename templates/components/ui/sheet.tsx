@@ -24,7 +24,6 @@ import { View } from "@/components/ui/view"
 import { useColor } from "@/hooks/useColor"
 import { FONT_SIZE, RADIUS } from "@/theme/globals"
 
-
 type SheetSide = "left" | "right"
 
 interface SheetProps {

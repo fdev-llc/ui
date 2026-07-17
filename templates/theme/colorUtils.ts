@@ -60,7 +60,7 @@ export function withAlpha(color: string, alpha: number): string {
       if (!Number.isFinite(n)) {
         throw new TypeError(`withAlpha: unparseable color "${color}"`)
       }
-      return Math.round(clamp01((isPct ? n / 100 : n / 255)) * 255)
+      return Math.round(clamp01(isPct ? n / 100 : n / 255) * 255)
     })
     return `rgba(${channels[0]}, ${channels[1]}, ${channels[2]}, ${a})`
   }

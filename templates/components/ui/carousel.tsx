@@ -22,7 +22,6 @@ import { View } from "@/components/ui/view"
 import { useColor } from "@/hooks/useColor"
 import { RADIUS } from "@/theme/globals"
 
-
 interface CarouselProps {
   children: React.ReactNode[]
   autoPlay?: boolean
