@@ -27,6 +27,7 @@ import { CORNERS, OVERLAY, RADIUS } from "@/theme/globals"
 type BottomSheetContentProps = {
   children: ReactNode
   title?: string
+  accessibilityHint?: string
   style?: ViewStyle
   rBottomSheetStyle: any
   mutedColor: string
@@ -38,6 +39,7 @@ type BottomSheetContentProps = {
 const BottomSheetContent = ({
   children,
   title,
+  accessibilityHint,
   style,
   rBottomSheetStyle,
   mutedColor,
@@ -54,6 +56,9 @@ const BottomSheetContent = ({
       role="dialog"
       accessibilityViewIsModal
       accessibilityLabel={title}
+      // The title names the sheet but rarely says what it is FOR. The kit stays
+      // i18n-agnostic, so the caller owns this copy — same contract as `Input`'s hint.
+      accessibilityHint={accessibilityHint}
       style={[styles.sheet, { height: screenHeight, top: screenHeight }, rBottomSheetStyle, style]}
     >
       <GlassSurface tier="strong" style={StyleSheet.absoluteFill} />
@@ -94,6 +99,8 @@ type BottomSheetProps = {
   snapPoints?: number[]
   enableBackdropDismiss?: boolean
   title?: string
+  /** Says what the sheet is FOR, beyond what `title` names it. Caller-owned copy. */
+  accessibilityHint?: string
   style?: ViewStyle
   disablePanGesture?: boolean
 }
@@ -105,6 +112,7 @@ export function BottomSheet({
   snapPoints = [0.3, 0.6, 0.9],
   enableBackdropDismiss = true,
   title,
+  accessibilityHint,
   style,
   disablePanGesture = false,
 }: BottomSheetProps) {
@@ -267,6 +275,7 @@ export function BottomSheet({
           {disablePanGesture ? (
             <BottomSheetContent
               title={title}
+              accessibilityHint={accessibilityHint}
               style={style}
               rBottomSheetStyle={rBottomSheetStyle}
               mutedColor={mutedColor}
@@ -278,6 +287,7 @@ export function BottomSheet({
             <GestureDetector gesture={gesture}>
               <BottomSheetContent
                 title={title}
+                accessibilityHint={accessibilityHint}
                 style={style}
                 rBottomSheetStyle={rBottomSheetStyle}
                 mutedColor={mutedColor}
