@@ -49,9 +49,20 @@ export function AlertDialog({
   showCancelButton = true,
   style,
 }: AlertDialogProps) {
-  const [modalVisible, setModalVisible] = useState(false)
+  const [modalVisible, setModalVisible] = useState(isVisible)
   const backdropOpacity = useSharedValue(0)
   const cardOpacity = useSharedValue(0)
+
+  /**
+   * The Modal has to outlive `isVisible` so the close fade can finish before it unmounts, which
+   * is why its mount is state and not the prop. Opening is adopted DURING RENDER — React's
+   * sanctioned "adjust state when a prop changes" path — rather than from the effect body:
+   * doing it there mounts the modal hidden and only flips it on a second pass, so the fade-in
+   * loses its first frames. Closing still waits on the fade's completion callback.
+   */
+  if (isVisible && !modalVisible) {
+    setModalVisible(true)
+  }
 
   const animateClose = () => {
     "worklet"
@@ -63,9 +74,16 @@ export function AlertDialog({
     cardOpacity.value = withTiming(0, { duration: 200 })
   }
 
+  // React's adjust-state-during-render pattern: opening mounts the Modal in the SAME
+  // render pass (a synchronous setState inside the effect would cascade a second one).
+  const [prevVisible, setPrevVisible] = useState(isVisible)
+  if (isVisible !== prevVisible) {
+    setPrevVisible(isVisible)
+    if (isVisible) setModalVisible(true)
+  }
+
   useEffect(() => {
     if (isVisible) {
-      setModalVisible(true)
       backdropOpacity.value = withTiming(1, { duration: 250 })
       cardOpacity.value = withTiming(1, { duration: 200 })
     } else {
