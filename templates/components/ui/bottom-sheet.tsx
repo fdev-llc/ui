@@ -47,6 +47,13 @@ const BottomSheetContent = ({
 
   return (
     <Animated.View
+      // The sheet is a modal surface: `accessibilityViewIsModal` keeps assistive tech from
+      // wandering into the content the backdrop visually blocks, and the role names what the
+      // trap actually is. Deliberately NOT `accessible` — that would collapse the title,
+      // body and every control inside into a single unreachable a11y element.
+      role="dialog"
+      accessibilityViewIsModal
+      accessibilityLabel={title}
       style={[styles.sheet, { height: screenHeight, top: screenHeight }, rBottomSheetStyle, style]}
     >
       <GlassSurface tier="strong" style={StyleSheet.absoluteFill} />

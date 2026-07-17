@@ -80,6 +80,21 @@ export const Input = forwardRef<TextInput, InputProps>(
      */
     const accessibleName = label ?? placeholder
 
+    /**
+     * An invalid field must say WHY it is invalid, and on RN that has to be the hint.
+     *
+     * RN 0.86 exposes no invalid state to assistive tech on either platform:
+     * `AccessibilityState` carries only disabled/selected/checked/busy/expanded, and there is
+     * no `aria-invalid`. So the error cannot be a machine-readable flag a screen reader turns
+     * into "invalid" — it has to reach the user as speech. The hint is the slot for exactly
+     * that: a field's non-obvious condition, read out after the name. The error Text carries
+     * `role="alert"` on top, so the message also announces the moment it appears.
+     *
+     * A caller-supplied hint still wins: the caller owns the copy, and its hint is the more
+     * specific instruction. It is never silently replaced by the error string.
+     */
+    const accessibleHint = accessibilityHint ?? error
+
     // Calculate height based on type
     const getHeight = () => {
       if (isTextarea) {
@@ -204,7 +219,7 @@ export const Input = forwardRef<TextInput, InputProps>(
                 editable={!disabled}
                 selectionColor={primary}
                 accessibilityLabel={accessibleName}
-                accessibilityHint={accessibilityHint}
+                accessibilityHint={accessibleHint}
                 {...props}
               />
             </>
@@ -248,7 +263,7 @@ export const Input = forwardRef<TextInput, InputProps>(
                   placeholder={placeholder}
                   selectionColor={primary}
                   accessibilityLabel={accessibleName}
-                  accessibilityHint={accessibilityHint}
+                  accessibilityHint={accessibleHint}
                   {...props}
                 />
               </View>
@@ -260,7 +275,13 @@ export const Input = forwardRef<TextInput, InputProps>(
         </Pressable>
 
         {/* Error Message */}
-        {error && <Text style={[styles.errorText, { color: danger }, errorStyle]}>{error}</Text>}
+        {error && (
+          // `role="alert"` announces the message as it appears, so the failure is not
+          // silent for anyone who is not looking at the field turn red.
+          <Text role="alert" style={[styles.errorText, { color: danger }, errorStyle]}>
+            {error}
+          </Text>
+        )}
       </View>
     )
 
@@ -321,8 +342,11 @@ export const GroupedInput = ({
       {errors.length > 0 && (
         <View style={styles.groupErrors}>
           {errors.map((error, i) => (
+            // Same contract as `Input`: the group renders its items' errors on their behalf,
+            // so the announcement has to happen here — the item has no error Text of its own.
             <Text
               key={i}
+              role="alert"
               style={[styles.groupErrorText, i > 0 && styles.groupErrorSpaced, { color: danger }]}
             >
               {error}
@@ -377,6 +401,13 @@ export const GroupedInputItem = forwardRef<TextInput, GroupedInputItemProps>(
 
     /** Same contract as `Input`: the sibling label names the field, the placeholder is fallback. */
     const accessibleName = label ?? placeholder
+
+    /**
+     * Same contract as `Input` — and it matters more here: a grouped item's error text is
+     * rendered by the enclosing `GroupedInput`, several nodes away, so the hint is the only
+     * thing tying the reason to the field it belongs to.
+     */
+    const accessibleHint = accessibilityHint ?? error
 
     const handleFocus = (e: any) => {
       onFocus?.(e)
@@ -453,7 +484,7 @@ export const GroupedInputItem = forwardRef<TextInput, GroupedInputItemProps>(
                 editable={!disabled}
                 selectionColor={primary}
                 accessibilityLabel={accessibleName}
-                accessibilityHint={accessibilityHint}
+                accessibilityHint={accessibleHint}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
                 {...props}
@@ -505,7 +536,7 @@ export const GroupedInputItem = forwardRef<TextInput, GroupedInputItemProps>(
                   editable={!disabled}
                   selectionColor={primary}
                   accessibilityLabel={accessibleName}
-                  accessibilityHint={accessibilityHint}
+                  accessibilityHint={accessibleHint}
                   onFocus={handleFocus}
                   onBlur={handleBlur}
                   {...props}

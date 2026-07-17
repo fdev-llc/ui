@@ -38,7 +38,21 @@ export interface ToastData {
   }
 }
 
-interface ToastProps extends ToastData {
+/**
+ * Copy for the dismiss affordance. The kit is i18n-agnostic — it ships English and a
+ * localized app overrides it on `ToastProvider`, exactly as `ModeToggle` takes its `hints`.
+ */
+export interface ToastAccessibilityCopy {
+  /** Names the close button. Default: "Dismiss". */
+  dismissLabel?: string
+  /** Says what pressing it does. Default: "Dismisses this notification". */
+  dismissHint?: string
+}
+
+const DEFAULT_DISMISS_LABEL = "Dismiss"
+const DEFAULT_DISMISS_HINT = "Dismisses this notification"
+
+interface ToastProps extends ToastData, ToastAccessibilityCopy {
   onDismiss: (id: string) => void
   index: number
 }
@@ -62,6 +76,8 @@ export function Toast({
   onDismiss,
   index,
   action,
+  dismissLabel = DEFAULT_DISMISS_LABEL,
+  dismissHint = DEFAULT_DISMISS_HINT,
 }: ToastProps) {
   const [isExpanded, setIsExpanded] = useState(false)
 
@@ -114,6 +130,22 @@ export function Toast({
       scale.value = withSpring(1, SPRING_CONFIG)
     }
   }, []) // This effect should only run once when the toast mounts
+
+  /**
+   * Keep the island's width on the LIVE window.
+   *
+   * The mount effect above copies `expandedWidth` into the shared value once, so an already
+   * open toast would keep its launch width through a rotation, an unfold, or a split-view
+   * resize — the island would sit visibly short of (or past) the 16pt gutter it is supposed
+   * to hold. The window read itself is reactive; only the copy into the shared value was not.
+   *
+   * Guarded on `isExpanded` because the compact island is a fixed-size pill by design: it is
+   * sized from DYNAMIC_ISLAND_WIDTH, never from the window.
+   */
+  useEffect(() => {
+    if (!isExpanded) return
+    width.value = expandedWidth
+  }, [expandedWidth, isExpanded, width])
 
   const getVariantColor = () => {
     switch (variant) {
@@ -234,7 +266,16 @@ export function Toast({
 
   return (
     <GestureDetector gesture={panGesture}>
-      <Animated.View style={[toastStyle, animatedContainerStyle]}>
+      <Animated.View
+        // A toast arrives unrequested and leaves on a timer: nothing moves focus to it, so
+        // without a live region it is invisible to a screen reader for its whole ~4s life.
+        // An error is the one variant worth interrupting for — the rest wait for a pause.
+        // Deliberately NOT `accessible` — that would collapse the title, description and
+        // both buttons into one node.
+        role="alert"
+        accessibilityLiveRegion={variant === "error" ? "assertive" : "polite"}
+        style={[toastStyle, animatedContainerStyle]}
+      >
         <Animated.View style={animatedIslandStyle}>
           <GlassSurface tier="strong" style={StyleSheet.absoluteFill} />
 
@@ -288,8 +329,11 @@ export function Toast({
                 </TouchableOpacity>
               )}
 
+              {/* An icon-only button reaches assistive tech unnamed — the X glyph is not a name. */}
               <TouchableOpacity
                 accessibilityRole="button"
+                accessibilityLabel={dismissLabel}
+                accessibilityHint={dismissHint}
                 onPress={dismiss}
                 style={styles.dismissButton}
               >
@@ -315,12 +359,17 @@ interface ToastContextType {
 
 const ToastContext = createContext<ToastContextType | null>(null)
 
-interface ToastProviderProps {
+interface ToastProviderProps extends ToastAccessibilityCopy {
   children: ReactNode
   maxToasts?: number
 }
 
-export function ToastProvider({ children, maxToasts = 3 }: ToastProviderProps) {
+export function ToastProvider({
+  children,
+  maxToasts = 3,
+  dismissLabel,
+  dismissHint,
+}: ToastProviderProps) {
   const [toasts, setToasts] = useState<ToastData[]>([])
 
   const generateId = () => Math.random().toString(36).substr(2, 9)
@@ -393,7 +442,14 @@ export function ToastProvider({ children, maxToasts = 3 }: ToastProviderProps) {
         {children}
         <View style={containerStyle} pointerEvents="box-none">
           {toasts.map((toast, index) => (
-            <Toast key={toast.id} {...toast} index={index} onDismiss={dismissToast} />
+            <Toast
+              key={toast.id}
+              {...toast}
+              index={index}
+              onDismiss={dismissToast}
+              dismissLabel={dismissLabel}
+              dismissHint={dismissHint}
+            />
           ))}
         </View>
       </GestureHandlerRootView>
