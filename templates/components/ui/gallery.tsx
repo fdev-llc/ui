@@ -13,7 +13,7 @@ import Animated, {
 import { Button } from "@/components/ui/button"
 import { Text } from "@/components/ui/text"
 import { useColor } from "@/hooks/useColor"
-import { BORDER_RADIUS } from "@/theme/globals"
+import { RADIUS } from "@/theme/globals"
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window")
 
@@ -740,7 +740,7 @@ const styles = StyleSheet.create({
   },
   emptyState: {
     alignItems: "center",
-    borderRadius: BORDER_RADIUS,
+    borderRadius: RADIUS["lg"],
     flex: 1,
     justifyContent: "center",
     margin: 16,

@@ -4,7 +4,7 @@ import { Alert as RNAlert, TextStyle, ViewStyle } from "react-native"
 import { Text } from "@/components/ui/text"
 import { View } from "@/components/ui/view"
 import { useColor } from "@/hooks/useColor"
-import { BORDER_RADIUS } from "@/theme/globals"
+import { BORDER_RADIUS, RADIUS } from "@/theme/globals"
 
 type AlertVariant = "default" | "destructive"
 
@@ -25,7 +25,7 @@ export function Alert({ children, variant = "default", style }: AlertProps) {
       style={[
         {
           padding: BORDER_RADIUS,
-          borderRadius: BORDER_RADIUS,
+          borderRadius: RADIUS["2xl"],
           backgroundColor: backgroundColor,
           borderWidth: 1,
           borderColor: variant === "destructive" ? destructiveColor : borderColor,

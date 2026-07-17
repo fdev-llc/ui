@@ -7,7 +7,7 @@ import { ScrollView } from "@/components/ui/scroll-view"
 import { Text } from "@/components/ui/text"
 import { View } from "@/components/ui/view"
 import { useColor } from "@/hooks/useColor"
-import { BORDER_RADIUS, CORNERS, FONT_SIZE, HEIGHT } from "@/theme/globals"
+import { CORNERS, FONT_SIZE, HEIGHT, RADIUS } from "@/theme/globals"
 import { withGeistFont } from "@/theme/typography"
 
 export interface PickerOption {
@@ -320,8 +320,8 @@ export function Picker({
           <Pressable
             style={{
               backgroundColor: cardColor,
-              borderTopStartRadius: BORDER_RADIUS,
-              borderTopEndRadius: BORDER_RADIUS,
+              borderTopStartRadius: RADIUS["4xl"],
+              borderTopEndRadius: RADIUS["4xl"],
               maxHeight: "70%",
               width: "100%",
               paddingBottom: 32,

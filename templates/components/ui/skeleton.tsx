@@ -9,7 +9,7 @@ import Animated, {
 } from "react-native-reanimated"
 
 import { useColor } from "@/hooks/useColor"
-import { BORDER_RADIUS, CORNERS } from "@/theme/globals"
+import { CORNERS, RADIUS } from "@/theme/globals"
 
 interface SkeletonProps {
   width?: number | string
@@ -55,7 +55,7 @@ export function Skeleton({
           width: width as any,
           height,
           backgroundColor: mutedColor,
-          borderRadius: variant === "default" ? CORNERS : BORDER_RADIUS,
+          borderRadius: variant === "default" ? CORNERS : RADIUS["2xl"],
         },
         animatedStyle,
         style,

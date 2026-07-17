@@ -16,7 +16,7 @@ import { AudioWaveform } from "@/components/ui/audio-waveform"
 import { Button } from "@/components/ui/button"
 import { Text } from "@/components/ui/text"
 import { useColor } from "@/hooks/useColor"
-import { BORDER_RADIUS } from "@/theme/globals"
+import { RADIUS } from "@/theme/globals"
 
 export interface AudioRecorderProps {
   style?: ViewStyle
@@ -402,7 +402,7 @@ export function AudioRecorder({
 const styles = StyleSheet.create({
   container: {
     alignItems: "center",
-    borderRadius: BORDER_RADIUS,
+    borderRadius: RADIUS["4xl"],
     padding: 20,
   },
   controlButton: {

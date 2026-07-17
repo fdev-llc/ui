@@ -20,7 +20,7 @@ import { Gesture, GestureDetector } from "react-native-gesture-handler"
 
 import { View } from "@/components/ui/view"
 import { useColor } from "@/hooks/useColor"
-import { BORDER_RADIUS } from "@/theme/globals"
+import { RADIUS } from "@/theme/globals"
 
 const { width: screenWidth } = Dimensions.get("window")
 
@@ -438,7 +438,7 @@ export function CarouselItem({ children, style }: CarouselItemProps) {
       style={[
         {
           backgroundColor,
-          borderRadius: BORDER_RADIUS,
+          borderRadius: RADIUS["lg"],
           borderWidth: 1,
           borderColor,
           padding: 16,

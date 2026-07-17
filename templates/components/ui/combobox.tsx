@@ -25,7 +25,7 @@ import {
 import { ChevronDown } from "lucide-react-native"
 
 import { useColor } from "@/hooks/useColor"
-import { BORDER_RADIUS, CORNERS, FONT_SIZE, HEIGHT } from "@/theme/globals"
+import { CORNERS, FONT_SIZE, HEIGHT, RADIUS } from "@/theme/globals"
 import { withGeistFont } from "@/theme/typography"
 
 // --- 1. DEFINE A SHARED OPTION TYPE ---
@@ -515,7 +515,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   dropdown: {
-    borderRadius: BORDER_RADIUS,
+    borderRadius: RADIUS["lg"],
     borderWidth: 1,
     elevation: 5,
     position: "absolute",

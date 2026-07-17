@@ -11,7 +11,7 @@ import {
 
 import { Button } from "@/components/ui/button"
 import { useColor } from "@/hooks/useColor"
-import { BORDER_RADIUS } from "@/theme/globals"
+import { RADIUS } from "@/theme/globals"
 
 // Context for sharing state between popover components
 interface PopoverContextType {
@@ -370,7 +370,7 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   content: {
-    borderRadius: BORDER_RADIUS,
+    borderRadius: RADIUS["3xl"],
     borderWidth: 1,
     elevation: 8,
     minWidth: 200,

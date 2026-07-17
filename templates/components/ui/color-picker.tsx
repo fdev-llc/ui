@@ -8,7 +8,7 @@ import Svg, { Defs, LinearGradient, Rect, Stop } from "react-native-svg"
 import { Text } from "@/components/ui/text"
 import { View } from "@/components/ui/view"
 import { useColor } from "@/hooks/useColor"
-import { BORDER_RADIUS, CORNERS, HEIGHT } from "@/theme/globals"
+import { CORNERS, HEIGHT, RADIUS } from "@/theme/globals"
 
 const { width: screenWidth } = Dimensions.get("window")
 const PICKER_SIZE = screenWidth - 40
@@ -272,7 +272,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
                 alignItems: "center",
                 marginBottom: 30,
                 justifyContent: "center",
-                borderRadius: BORDER_RADIUS,
+                borderRadius: RADIUS["lg"],
                 backgroundColor: currentColor,
               }}
             >
@@ -341,7 +341,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
 
 const styles = StyleSheet.create({
   colorBase: {
-    borderRadius: BORDER_RADIUS,
+    borderRadius: RADIUS["lg"],
     height: PICKER_SIZE,
     position: "absolute",
     width: PICKER_SIZE,
@@ -387,7 +387,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   pickerContainer: {
-    borderRadius: BORDER_RADIUS,
+    borderRadius: RADIUS["lg"],
     marginBottom: 30,
     overflow: "hidden",
   },

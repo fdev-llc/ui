@@ -13,7 +13,7 @@ import { Text } from "@/components/ui/text"
 import { View } from "@/components/ui/view"
 import { useColor } from "@/hooks/useColor"
 import { useKeyboardHeight } from "@/hooks/useKeyboardHeight" // Make sure this path is correct
-import { BORDER_RADIUS } from "@/theme/globals"
+import { RADIUS } from "@/theme/globals"
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("window")
 const MAX_TRANSLATE_Y = -SCREEN_HEIGHT + 50
@@ -48,8 +48,8 @@ const BottomSheetContent = ({
           position: "absolute",
           top: SCREEN_HEIGHT,
           backgroundColor: cardColor,
-          borderTopLeftRadius: BORDER_RADIUS,
-          borderTopRightRadius: BORDER_RADIUS,
+          borderTopLeftRadius: RADIUS["4xl"],
+          borderTopRightRadius: RADIUS["4xl"],
         },
         rBottomSheetStyle,
         style,

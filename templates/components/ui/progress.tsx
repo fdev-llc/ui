@@ -10,7 +10,7 @@ import Animated, {
 
 import { View } from "@/components/ui/view"
 import { useColor } from "@/hooks/useColor"
-import { HEIGHT } from "@/theme/globals"
+import { CORNERS } from "@/theme/globals"
 
 interface ProgressProps {
   value: number // 0-100
@@ -25,7 +25,7 @@ interface ProgressProps {
 export function Progress({
   value,
   style,
-  height = HEIGHT,
+  height = 8,
   onValueChange,
   onSeekStart,
   onSeekEnd,
@@ -114,7 +114,7 @@ export function Progress({
       height: height,
       width: "100%" as const,
       backgroundColor: mutedColor,
-      borderRadius: height / 2,
+      borderRadius: CORNERS,
       overflow: "hidden" as const,
     },
     ...(style ? [style] : []),
@@ -133,7 +133,7 @@ export function Progress({
               {
                 height: "100%" as const,
                 backgroundColor: primaryColor,
-                borderRadius: height / 2,
+                borderRadius: CORNERS,
               },
               animatedProgressStyle,
             ]}
@@ -150,7 +150,7 @@ export function Progress({
           {
             height: "100%" as const,
             backgroundColor: primaryColor,
-            borderRadius: height / 2,
+            borderRadius: CORNERS,
           },
           animatedProgressStyle,
         ]}

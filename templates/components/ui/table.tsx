@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button"
 import { Text } from "@/components/ui/text"
 import { View } from "@/components/ui/view"
 import { useColor } from "@/hooks/useColor"
-import { BORDER_RADIUS, FONT_SIZE, HEIGHT } from "@/theme/globals"
+import { FONT_SIZE, HEIGHT, RADIUS } from "@/theme/globals"
 import { withGeistFont } from "@/theme/typography"
 
 // Types
@@ -414,7 +414,7 @@ export function Table<T = any>({
       style={[
         {
           width: "100%",
-          borderRadius: BORDER_RADIUS,
+          borderRadius: RADIUS["4xl"],
           borderWidth: 1,
           borderColor: borderColor,
           backgroundColor: cardColor,

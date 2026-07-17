@@ -17,6 +17,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { useColor } from "@/hooks/useColor"
+import { RADIUS } from "@/theme/globals"
 
 export type AlertDialogProps = {
   isVisible: boolean
@@ -161,7 +162,7 @@ const styles = StyleSheet.create({
   },
   // Rounded corners and clipping consolidated here (non-animated)
   roundedWrapper: {
-    borderRadius: 16,
+    borderRadius: RADIUS["xl"],
     overflow: "hidden",
     width: "100%",
   },

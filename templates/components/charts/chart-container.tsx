@@ -3,7 +3,7 @@ import { ViewStyle } from "react-native"
 import { Text } from "@/components/ui/text"
 import { View } from "@/components/ui/view"
 import { useColor } from "@/hooks/useColor"
-import { BORDER_RADIUS } from "@/theme/globals"
+import { RADIUS } from "@/theme/globals"
 
 type Props = {
   title?: string
@@ -20,7 +20,7 @@ export const ChartContainer = ({ title, description, children, style }: Props) =
       style={[
         {
           backgroundColor: cardColor,
-          borderRadius: BORDER_RADIUS,
+          borderRadius: RADIUS["4xl"],
           padding: 16,
           width: "100%", // Full container width
         },

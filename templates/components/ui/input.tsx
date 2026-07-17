@@ -5,7 +5,7 @@ import { LucideProps } from "lucide-react-native"
 import { Icon } from "@/components/ui/icon"
 import { Text } from "@/components/ui/text"
 import { useColor } from "@/hooks/useColor"
-import { BORDER_RADIUS, CORNERS, FONT_SIZE, HEIGHT } from "@/theme/globals"
+import { CONTROL_FONT_SIZE, FONT_SIZE, HEIGHT, RADIUS } from "@/theme/globals"
 import { withGeistFont } from "@/theme/typography"
 
 export interface InputProps extends Omit<TextInputProps, "style"> {
@@ -69,7 +69,7 @@ export const Input = forwardRef<TextInput, InputProps>(
     // Variant styles
     const getVariantStyle = (): ViewStyle => {
       const baseStyle: ViewStyle = {
-        borderRadius: isTextarea ? BORDER_RADIUS : CORNERS,
+        borderRadius: RADIUS["3xl"],
         flexDirection: isTextarea ? "column" : "row",
         alignItems: isTextarea ? "stretch" : "center",
         minHeight: getHeight(),
@@ -166,6 +166,7 @@ export const Input = forwardRef<TextInput, InputProps>(
                         ellipsizeMode="tail"
                         style={[
                           {
+                            fontSize: CONTROL_FONT_SIZE,
                             color: error ? danger : muted,
                           },
                           labelStyle,
@@ -224,6 +225,7 @@ export const Input = forwardRef<TextInput, InputProps>(
                     ellipsizeMode="tail"
                     style={[
                       {
+                        fontSize: CONTROL_FONT_SIZE,
                         color: error ? danger : muted,
                       },
                       labelStyle,
@@ -263,7 +265,7 @@ export const Input = forwardRef<TextInput, InputProps>(
               {
                 marginLeft: 14,
                 marginTop: 4,
-                fontSize: 14,
+                fontSize: CONTROL_FONT_SIZE,
                 color: danger,
               },
               errorStyle,
@@ -318,7 +320,7 @@ export const GroupedInput = ({
           backgroundColor: background,
           borderColor: border,
           borderWidth: 1,
-          borderRadius: BORDER_RADIUS,
+          borderRadius: RADIUS["3xl"],
           overflow: "hidden",
         }}
       >
@@ -345,7 +347,7 @@ export const GroupedInput = ({
             <Text
               key={i}
               style={{
-                fontSize: 14,
+                fontSize: CONTROL_FONT_SIZE,
                 color: danger,
                 marginTop: i === 0 ? 0 : 1,
                 marginLeft: 8,
@@ -463,6 +465,7 @@ export const GroupedInputItem = forwardRef<TextInput, GroupedInputItemProps>(
                         ellipsizeMode="tail"
                         style={[
                           {
+                            fontSize: CONTROL_FONT_SIZE,
                             color: error ? danger : muted,
                           },
                           labelStyle,
@@ -532,6 +535,7 @@ export const GroupedInputItem = forwardRef<TextInput, GroupedInputItemProps>(
                     ellipsizeMode="tail"
                     style={[
                       {
+                        fontSize: CONTROL_FONT_SIZE,
                         color: error ? danger : muted,
                       },
                       labelStyle,

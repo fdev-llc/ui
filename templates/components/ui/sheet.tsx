@@ -22,7 +22,7 @@ import { Button } from "@/components/ui/button"
 import { Text } from "@/components/ui/text"
 import { View } from "@/components/ui/view"
 import { useColor } from "@/hooks/useColor"
-import { BORDER_RADIUS, FONT_SIZE } from "@/theme/globals"
+import { FONT_SIZE, RADIUS } from "@/theme/globals"
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window")
 
@@ -180,7 +180,7 @@ export function SheetContent({ children, style }: SheetContentProps) {
           style={[
             styles.sheet,
             {
-              borderRadius: BORDER_RADIUS,
+              borderRadius: RADIUS["3xl"],
               backgroundColor,
               borderColor,
               width: sheetWidth,

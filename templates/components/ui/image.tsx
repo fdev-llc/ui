@@ -5,7 +5,7 @@ import { Image as ExpoImage, ImageProps as ExpoImageProps, ImageSource } from "e
 import { Text } from "@/components/ui/text"
 import { View } from "@/components/ui/view"
 import { useColor } from "@/hooks/useColor"
-import { BORDER_RADIUS, CORNERS } from "@/theme/globals"
+import { CORNERS, RADIUS } from "@/theme/globals"
 
 export interface ImageProps extends Omit<ExpoImageProps, "style"> {
   variant?: "rounded" | "circle" | "default"
@@ -57,11 +57,11 @@ export const Image = forwardRef<ExpoImage, ImageProps>(
         case "circle":
           return CORNERS
         case "rounded":
-          return BORDER_RADIUS
+          return RADIUS["lg"]
         case "default":
           return 0
         default:
-          return BORDER_RADIUS
+          return RADIUS["lg"]
       }
     }
 

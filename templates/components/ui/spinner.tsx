@@ -14,7 +14,7 @@ import Animated, {
 
 import { Text } from "@/components/ui/text"
 import { useColor } from "@/hooks/useColor"
-import { BORDER_RADIUS, CORNERS, FONT_SIZE } from "@/theme/globals"
+import { CORNERS, FONT_SIZE, RADIUS } from "@/theme/globals"
 
 // Types
 type SpinnerSize = "default" | "sm" | "lg" | "icon"
@@ -427,7 +427,7 @@ const styles = StyleSheet.create({
     zIndex: 9999,
   },
   overlayContent: {
-    borderRadius: BORDER_RADIUS,
+    borderRadius: RADIUS["4xl"],
     padding: 60,
   },
   pulseSpinner: {

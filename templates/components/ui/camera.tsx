@@ -39,7 +39,7 @@ import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Text } from "@/components/ui/text"
 import { useColor } from "@/hooks/useColor"
-import { BORDER_RADIUS, FONT_SIZE } from "@/theme/globals"
+import { FONT_SIZE, RADIUS } from "@/theme/globals"
 
 const { width: screenWidth } = Dimensions.get("window")
 
@@ -667,7 +667,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   cameraContainer: {
-    borderRadius: BORDER_RADIUS,
+    borderRadius: RADIUS["lg"],
     overflow: "hidden",
     width: screenWidth,
   },
@@ -758,7 +758,7 @@ const styles = StyleSheet.create({
   },
   permissionContainer: {
     alignItems: "center",
-    borderRadius: BORDER_RADIUS,
+    borderRadius: RADIUS["lg"],
     gap: 16,
     padding: 32,
   },
@@ -801,7 +801,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   settingsPanel: {
-    borderRadius: BORDER_RADIUS,
+    borderRadius: RADIUS["lg"],
     left: 20,
     padding: 16,
     position: "absolute",

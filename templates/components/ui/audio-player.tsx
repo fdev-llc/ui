@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Text } from "@/components/ui/text"
 import { useColor } from "@/hooks/useColor"
-import { BORDER_RADIUS } from "@/theme/globals"
+import { RADIUS } from "@/theme/globals"
 
 export interface AudioPlayerProps {
   source: AudioSource
@@ -255,7 +255,7 @@ export function AudioPlayer({
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: BORDER_RADIUS,
+    borderRadius: RADIUS["4xl"],
     margin: 8,
     padding: 16,
   },

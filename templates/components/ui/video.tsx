@@ -13,7 +13,7 @@ import Animated, {
 } from "react-native-reanimated"
 
 import { useColor } from "@/hooks/useColor"
-import { BORDER_RADIUS } from "@/theme/globals"
+import { RADIUS } from "@/theme/globals"
 
 interface VideoProps {
   source: VideoSource
@@ -424,7 +424,7 @@ const styles = StyleSheet.create({
     width: 80,
   },
   container: {
-    borderRadius: BORDER_RADIUS,
+    borderRadius: RADIUS["lg"],
     height: "100%",
     overflow: "hidden",
     width: "100%",

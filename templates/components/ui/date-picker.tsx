@@ -18,7 +18,7 @@ import { ScrollView } from "@/components/ui/scroll-view"
 import { Text } from "@/components/ui/text"
 import { View } from "@/components/ui/view"
 import { useColor } from "@/hooks/useColor"
-import { BORDER_RADIUS, CORNERS, FONT_SIZE, HEIGHT } from "@/theme/globals"
+import { CORNERS, FONT_SIZE, HEIGHT, RADIUS } from "@/theme/globals"
 
 export interface DateRange {
   startDate: Date | null
@@ -643,7 +643,7 @@ export function DatePicker(props: DatePickerProps) {
             padding: 20,
             paddingHorizontal: 36,
             backgroundColor: mutedColor,
-            borderRadius: BORDER_RADIUS,
+            borderRadius: RADIUS["lg"],
           }}
         >
           <Text variant="subtitle" style={{ flex: 1 }}>

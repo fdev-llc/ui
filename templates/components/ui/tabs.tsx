@@ -13,7 +13,7 @@ import Animated, {
 import { Text } from "@/components/ui/text"
 import { View } from "@/components/ui/view"
 import { useColor } from "@/hooks/useColor"
-import { BORDER_RADIUS, CORNERS, FONT_SIZE, HEIGHT } from "@/theme/globals"
+import { CORNERS, FONT_SIZE, HEIGHT, RADIUS } from "@/theme/globals"
 
 const { width: screenWidth } = Dimensions.get("window")
 
@@ -355,7 +355,7 @@ export function TabsList({ children, style }: TabsListProps) {
         {
           padding: 6,
           backgroundColor,
-          borderRadius: orientation === "horizontal" ? CORNERS : BORDER_RADIUS,
+          borderRadius: orientation === "horizontal" ? CORNERS : RADIUS["2xl"],
         },
         style,
       ]}
