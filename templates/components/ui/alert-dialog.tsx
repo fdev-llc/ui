@@ -74,14 +74,6 @@ export function AlertDialog({
     cardOpacity.value = withTiming(0, { duration: 200 })
   }
 
-  // React's adjust-state-during-render pattern: opening mounts the Modal in the SAME
-  // render pass (a synchronous setState inside the effect would cascade a second one).
-  const [prevVisible, setPrevVisible] = useState(isVisible)
-  if (isVisible !== prevVisible) {
-    setPrevVisible(isVisible)
-    if (isVisible) setModalVisible(true)
-  }
-
   useEffect(() => {
     if (isVisible) {
       backdropOpacity.value = withTiming(1, { duration: 250 })
@@ -94,7 +86,7 @@ export function AlertDialog({
       })
       cardOpacity.value = withTiming(0, { duration: 200 })
     }
-  }, [isVisible])
+  }, [isVisible, backdropOpacity, cardOpacity])
 
   const rBackdropStyle = useAnimatedStyle(() => ({
     opacity: backdropOpacity.value,
