@@ -131,7 +131,8 @@ export const comboboxRegistry = {
     name: 'combobox-form',
     description: 'Combobox integrated with form validation',
     type: 'registry:ui',
-    registryDependencies: ['combobox', 'text', 'view'],
+    // combobox-form.tsx imports Button from @/components/ui/button.
+    registryDependencies: ['button', 'combobox', 'text', 'view'],
     hooks: [],
     theme: [],
     files: [

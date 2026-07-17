@@ -10,7 +10,9 @@ export const spinnerRegistry = {
     dependencies: ['lucide-react-native', 'react-native-reanimated'],
     registryDependencies: ['text'],
     hooks: ['useColor'],
-    theme: ['globals'],
+    // spinner.tsx imports withAlpha from @/theme/colorUtils; without it declared here,
+    // `bna-ui add spinner` installs a component that cannot resolve its own import.
+    theme: ['colorUtils', 'globals'],
     files: [
       {
         type: 'registry:ui',

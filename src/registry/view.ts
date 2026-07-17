@@ -10,7 +10,9 @@ export const viewRegistry = {
     dependencies: [],
     registryDependencies: [],
     hooks: [],
-    theme: [],
+    // view.tsx imports TRANSPARENT from @/theme/globals. `view` is a dependency of most of
+    // the kit, so an undeclared theme file here breaks far more than `bna-ui add view`.
+    theme: ['globals'],
     files: [
       {
         type: 'registry:ui',
