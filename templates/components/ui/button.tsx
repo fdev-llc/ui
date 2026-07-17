@@ -21,7 +21,13 @@ import { useColor } from "@/hooks/useColor"
 import { FONT_SIZE, HEIGHT, RADIUS } from "@/theme/globals"
 
 export type ButtonVariant =
-  "default" | "destructive" | "success" | "outline" | "secondary" | "ghost" | "link"
+  | "default"
+  | "destructive"
+  | "success"
+  | "outline"
+  | "secondary"
+  | "ghost"
+  | "link"
 
 export type ButtonSize = "default" | "sm" | "lg" | "icon"
 

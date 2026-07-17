@@ -52,6 +52,7 @@ export const Input = forwardRef<TextInput, InputProps>(
       onFocus,
       onBlur,
       placeholder,
+      accessibilityHint,
       ...props
     },
     ref,
@@ -73,6 +74,9 @@ export const Input = forwardRef<TextInput, InputProps>(
      * The visible label names the field, but it is a sibling Text — the TextInput itself would
      * otherwise reach assistive tech unnamed. The placeholder is only a fallback: it is a hint,
      * not a name, and it disappears the moment the field has a value.
+     *
+     * `accessibilityHint` is threaded explicitly rather than left to `...props` because the kit
+     * stays i18n-agnostic: the caller owns the copy, exactly as `ModeToggle` takes its `hints`.
      */
     const accessibleName = label ?? placeholder
 
@@ -200,6 +204,7 @@ export const Input = forwardRef<TextInput, InputProps>(
                 editable={!disabled}
                 selectionColor={primary}
                 accessibilityLabel={accessibleName}
+                accessibilityHint={accessibilityHint}
                 {...props}
               />
             </>
@@ -243,6 +248,7 @@ export const Input = forwardRef<TextInput, InputProps>(
                   placeholder={placeholder}
                   selectionColor={primary}
                   accessibilityLabel={accessibleName}
+                  accessibilityHint={accessibilityHint}
                   {...props}
                 />
               </View>
@@ -357,6 +363,7 @@ export const GroupedInputItem = forwardRef<TextInput, GroupedInputItemProps>(
       onFocus,
       onBlur,
       placeholder,
+      accessibilityHint,
       ...props
     },
     ref,
@@ -446,6 +453,7 @@ export const GroupedInputItem = forwardRef<TextInput, GroupedInputItemProps>(
                 editable={!disabled}
                 selectionColor={primary}
                 accessibilityLabel={accessibleName}
+                accessibilityHint={accessibilityHint}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
                 {...props}
@@ -497,6 +505,7 @@ export const GroupedInputItem = forwardRef<TextInput, GroupedInputItemProps>(
                   editable={!disabled}
                   selectionColor={primary}
                   accessibilityLabel={accessibleName}
+                  accessibilityHint={accessibilityHint}
                   onFocus={handleFocus}
                   onBlur={handleBlur}
                   {...props}
