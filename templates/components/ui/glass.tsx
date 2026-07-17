@@ -39,21 +39,25 @@ function useReduceTransparency(): boolean | null {
 
   useEffect(() => {
     let active = true
+    // An event carries FRESHER truth than the initial read: if one lands before the
+    // in-flight promise resolves, the stale resolution must not overwrite it (the user
+    // just flipped the setting — re-enabling blur indefinitely would be the bug).
+    let eventSeen = false
 
     // The listener alone would never fire for someone who had the setting ON before mount.
     AccessibilityInfo.isReduceTransparencyEnabled()
       .then((enabled) => {
-        if (active) setReduceTransparency(enabled)
+        if (active && !eventSeen) setReduceTransparency(enabled)
       })
       // RN rejects this when the iOS accessibility manager is unavailable. Swallowing it
       // leaves the state `null`, which is the opaque card — if we cannot find out whether
       // the user asked to reduce transparency, we do not get to assume they did not.
       .catch(() => {})
 
-    const subscription = AccessibilityInfo.addEventListener(
-      "reduceTransparencyChanged",
-      setReduceTransparency,
-    )
+    const subscription = AccessibilityInfo.addEventListener("reduceTransparencyChanged", (v) => {
+      eventSeen = true
+      setReduceTransparency(v)
+    })
 
     return () => {
       // `active` guards the in-flight promise: without it a resolve after unmount sets

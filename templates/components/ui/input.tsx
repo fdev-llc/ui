@@ -93,7 +93,11 @@ export const Input = forwardRef<TextInput, InputProps>(
      * A caller-supplied hint still wins: the caller owns the copy, and its hint is the more
      * specific instruction. It is never silently replaced by the error string.
      */
-    const accessibleHint = accessibilityHint ?? error
+    // Both survive: the caller's instruction AND the current error. A hint that
+    // simply replaced the error would leave a focused invalid field with no
+    // persistent machine-readable reason after the one-time alert announcement.
+    const accessibleHint =
+      accessibilityHint && error ? `${accessibilityHint}. ${error}` : (accessibilityHint ?? error)
 
     // Calculate height based on type
     const getHeight = () => {
@@ -407,7 +411,11 @@ export const GroupedInputItem = forwardRef<TextInput, GroupedInputItemProps>(
      * rendered by the enclosing `GroupedInput`, several nodes away, so the hint is the only
      * thing tying the reason to the field it belongs to.
      */
-    const accessibleHint = accessibilityHint ?? error
+    // Both survive: the caller's instruction AND the current error. A hint that
+    // simply replaced the error would leave a focused invalid field with no
+    // persistent machine-readable reason after the one-time alert announcement.
+    const accessibleHint =
+      accessibilityHint && error ? `${accessibilityHint}. ${error}` : (accessibilityHint ?? error)
 
     const handleFocus = (e: any) => {
       onFocus?.(e)
