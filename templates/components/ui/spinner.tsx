@@ -294,8 +294,19 @@ export function Spinner({
     gap: config.gap,
   }
 
+  /**
+   * A spinner is a busy indicator, so it must announce itself as one rather than sit in the
+   * tree as an unlabelled decorative view. Grouping is deliberate: the spinner and its label
+   * are one status, and neither is focusable on its own, so assistive tech reads "<label>,
+   * busy" as a single announcement instead of stopping on a mute view.
+   */
   return (
-    <View style={[containerStyle, style]}>
+    <View
+      accessible
+      accessibilityRole="progressbar"
+      accessibilityState={{ busy: true }}
+      style={[containerStyle, style]}
+    >
       {renderSpinner()}
       {(showLabel || label) && (
         <Text

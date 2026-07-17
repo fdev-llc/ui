@@ -21,13 +21,7 @@ import { useColor } from "@/hooks/useColor"
 import { FONT_SIZE, HEIGHT, RADIUS } from "@/theme/globals"
 
 export type ButtonVariant =
-  | "default"
-  | "destructive"
-  | "success"
-  | "outline"
-  | "secondary"
-  | "ghost"
-  | "link"
+  "default" | "destructive" | "success" | "outline" | "secondary" | "ghost" | "link"
 
 export type ButtonSize = "default" | "sm" | "lg" | "icon"
 
@@ -325,6 +319,17 @@ export const Button = forwardRef<View, ButtonProps>(
     const iconSize = getIconSize()
     const styleWithoutFlex = getStyleWithoutFlex()
 
+    /**
+     * `busy` is reported separately from `disabled`: a loading button is inert for the same
+     * reason a disabled one is, but only one of the two is a permanent property of the
+     * control — a screen reader must be able to say "busy" rather than "dimmed".
+     * Spread before `...props` so a caller can still override any of it.
+     */
+    const a11yProps = {
+      accessibilityRole: "button" as const,
+      accessibilityState: { disabled: disabled || loading, busy: loading },
+    }
+
     return animation ? (
       <Pressable
         ref={ref}
@@ -333,6 +338,7 @@ export const Button = forwardRef<View, ButtonProps>(
         onPressOut={handlePressOut}
         disabled={disabled || loading}
         style={getPressableStyle()}
+        {...a11yProps}
         {...props}
       >
         <Animated.View style={[animatedStyle, buttonStyle, styleWithoutFlex]}>
@@ -358,6 +364,7 @@ export const Button = forwardRef<View, ButtonProps>(
         onPress={handleTouchablePress}
         disabled={disabled || loading}
         activeOpacity={0.8}
+        {...a11yProps}
         {...props}
       >
         {loading ? (

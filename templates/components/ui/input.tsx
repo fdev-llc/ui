@@ -69,6 +69,13 @@ export const Input = forwardRef<TextInput, InputProps>(
 
     const isTextarea = type === "textarea"
 
+    /**
+     * The visible label names the field, but it is a sibling Text — the TextInput itself would
+     * otherwise reach assistive tech unnamed. The placeholder is only a fallback: it is a hint,
+     * not a name, and it disappears the moment the field has a value.
+     */
+    const accessibleName = label ?? placeholder
+
     // Calculate height based on type
     const getHeight = () => {
       if (isTextarea) {
@@ -192,6 +199,7 @@ export const Input = forwardRef<TextInput, InputProps>(
                 onBlur={handleBlur}
                 editable={!disabled}
                 selectionColor={primary}
+                accessibilityLabel={accessibleName}
                 {...props}
               />
             </>
@@ -234,6 +242,7 @@ export const Input = forwardRef<TextInput, InputProps>(
                   editable={!disabled}
                   placeholder={placeholder}
                   selectionColor={primary}
+                  accessibilityLabel={accessibleName}
                   {...props}
                 />
               </View>
@@ -359,6 +368,9 @@ export const GroupedInputItem = forwardRef<TextInput, GroupedInputItemProps>(
 
     const isTextarea = type === "textarea"
 
+    /** Same contract as `Input`: the sibling label names the field, the placeholder is fallback. */
+    const accessibleName = label ?? placeholder
+
     const handleFocus = (e: any) => {
       onFocus?.(e)
     }
@@ -433,6 +445,7 @@ export const GroupedInputItem = forwardRef<TextInput, GroupedInputItemProps>(
                 placeholder={placeholder || "Type your message..."}
                 editable={!disabled}
                 selectionColor={primary}
+                accessibilityLabel={accessibleName}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
                 {...props}
@@ -483,6 +496,7 @@ export const GroupedInputItem = forwardRef<TextInput, GroupedInputItemProps>(
                   placeholderTextColor={error ? withAlpha(danger, 0.6) : muted}
                   editable={!disabled}
                   selectionColor={primary}
+                  accessibilityLabel={accessibleName}
                   onFocus={handleFocus}
                   onBlur={handleBlur}
                   {...props}

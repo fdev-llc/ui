@@ -124,10 +124,21 @@ export function Progress({
     containerWidth.value = event.nativeEvent.layout.width
   }
 
+  /**
+   * Without this a progress bar is an anonymous view: a screen-reader user gets no sense of
+   * completion. `now` carries the CLAMPED value so what is announced matches what is drawn.
+   * Safe to group: the bar has no individually focusable children.
+   */
+  const a11yProps = {
+    accessible: true,
+    accessibilityRole: "progressbar" as const,
+    accessibilityValue: { min: 0, max: 100, now: clampedValue },
+  }
+
   if (interactive) {
     return (
       <GestureDetector gesture={combinedGesture}>
-        <Animated.View style={containerStyle} onLayout={onLayout}>
+        <Animated.View style={containerStyle} onLayout={onLayout} {...a11yProps}>
           <Animated.View
             style={[
               {
@@ -144,7 +155,7 @@ export function Progress({
   }
 
   return (
-    <View style={containerStyle} onLayout={onLayout}>
+    <View style={containerStyle} onLayout={onLayout} {...a11yProps}>
       <Animated.View
         style={[
           {

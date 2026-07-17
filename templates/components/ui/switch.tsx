@@ -19,9 +19,8 @@ interface SwitchProps extends RNSwitchProps {
 export function Switch({ label, error, labelStyle, ...props }: SwitchProps) {
   const mutedColor = useColor("muted")
   const primary = useColor("primary")
+  const primaryForeground = useColor("primaryForeground")
   const danger = useColor("destructive")
-  const successColor = useColor("success")
-  const successForegroundColor = useColor("successForeground")
 
   return (
     <View style={styles.container}>
@@ -38,9 +37,15 @@ export function Switch({ label, error, labelStyle, ...props }: SwitchProps) {
           </Text>
         )}
 
+        {/*
+          ON is the PRIMARY accent, not `success`: a switch reports a setting's state, it does
+          not report an outcome. `success` here made every enabled toggle read as a positive
+          result and diverged from every other control's accent. The thumb follows the track's
+          foreground so the pairing keeps its contrast.
+        */}
         <RNSwitch
-          trackColor={{ false: mutedColor, true: successColor }}
-          thumbColor={props.value ? successForegroundColor : mutedColor}
+          trackColor={{ false: mutedColor, true: primary }}
+          thumbColor={props.value ? primaryForeground : mutedColor}
           {...props}
         />
       </View>

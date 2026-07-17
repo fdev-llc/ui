@@ -17,15 +17,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { GlassSurface } from "@/components/ui/glass"
-import { RADIUS } from "@/theme/globals"
-
-/**
- * The scrim is deliberately module-local rather than a `useColor` key or a theme export:
- * it is the same ink in both schemes (it dims whatever is behind it), so resolving it
- * per-scheme would invert it, and consumers that vendor only `components/` must not have
- * to mirror a new theme export to compile this file.
- */
-const SCRIM = "rgba(0, 0, 0, 0.8)"
+import { OVERLAY, RADIUS } from "@/theme/globals"
 
 export type AlertDialogProps = {
   isVisible: boolean
@@ -160,7 +152,7 @@ export function AlertDialog({
 const styles = StyleSheet.create({
   backdrop: {
     alignItems: "center",
-    backgroundColor: SCRIM,
+    backgroundColor: OVERLAY.strong,
     flex: 1,
     justifyContent: "center",
     padding: 24,
