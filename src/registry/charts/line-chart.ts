@@ -8,14 +8,10 @@ export const lineChartRegistry = {
     description:
       'A customizable line chart component with animations, interactions, and gradient fills.',
     type: 'registry:ui',
-    dependencies: [
-      'react-native-svg',
-      'react-native-reanimated',
-      'react-native-gesture-handler',
-    ],
+    dependencies: ['react-native-gesture-handler', 'react-native-reanimated', 'react-native-svg'],
     registryDependencies: [],
     hooks: ['useColor'],
-    theme: ['globals'],
+    theme: [],
     files: [
       {
         type: 'registry:ui',

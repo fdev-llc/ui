@@ -7,7 +7,7 @@ export const filePickerRegistry = {
     description:
       'A customizable file picker component with validation, preview, and multiple file support.',
     type: 'registry:ui',
-    dependencies: ['lucide-react-native', 'expo-document-picker'],
+    dependencies: ['expo-document-picker', 'lucide-react-native'],
     registryDependencies: ['button', 'text', 'view'],
     hooks: ['useColor'],
     theme: ['globals'],

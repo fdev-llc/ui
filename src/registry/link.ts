@@ -5,9 +5,9 @@ export const linkRegistry = {
   link: {
     name: 'link',
     description:
-      'A navigation component that handles both internal and external links with customizable browser behavior.',
+      'A navigation component (react-navigation) that handles both internal and external links with customizable browser behavior.',
     type: 'registry:ui',
-    dependencies: ['expo-router', 'expo-web-browser'],
+    dependencies: ['@react-navigation/native', 'expo-web-browser'],
     registryDependencies: ['text'],
     hooks: [],
     theme: [],

@@ -8,8 +8,9 @@ export const audioWaveformRegistry = {
     description:
       'A customizable audio waveform visualization component with playback progress and interactive seeking capabilities.',
     type: 'registry:ui',
+    dependencies: ['react-native-gesture-handler', 'react-native-reanimated'],
     registryDependencies: ['text', 'view'],
-    hooks: [],
+    hooks: ['useColor'],
     theme: [],
     files: [
       {

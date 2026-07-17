@@ -4,13 +4,15 @@ export const modeToggleRegistry = {
   // Main mode-toggle component
   'mode-toggle': {
     name: 'mode-toggle',
+    // Controlled: the caller owns the preference and the labels. The component
+    // never calls Appearance and never persists.
     description:
-      'An animated button component for switching between light and dark themes.',
+      'A controlled three-choice theme picker (light/dark/system) with radiogroup semantics.',
     type: 'registry:ui',
-    dependencies: ['lucide-react-native', 'react-native-reanimated'],
-    registryDependencies: ['button', 'icon'],
-    hooks: ['useModeToggle'],
-    theme: [],
+    dependencies: ['lucide-react-native'],
+    registryDependencies: ['button', 'icon', 'text'],
+    hooks: ['useColor'],
+    theme: ['globals'],
     files: [
       {
         type: 'registry:ui',
@@ -28,7 +30,7 @@ export const modeToggleRegistry = {
   // Default demo
   'mode-toggle-demo': {
     name: 'mode-toggle-demo',
-    description: 'Animated theme toggle button',
+    description: 'Controlled three-choice theme picker',
     type: 'registry:example',
     registryDependencies: ['mode-toggle'],
     hooks: [],

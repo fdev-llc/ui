@@ -8,7 +8,7 @@ export const toggleRegistry = {
     description: 'A two-state button that can be either on or off.',
     type: 'registry:ui',
     dependencies: ['lucide-react-native'],
-    registryDependencies: ['text', 'view', 'icon'],
+    registryDependencies: ['icon', 'text', 'view'],
     hooks: ['useColor'],
     theme: ['globals'],
     files: [

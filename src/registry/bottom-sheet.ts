@@ -9,8 +9,8 @@ export const bottomSheetRegistry = {
       'A modal sheet component that slides up from the bottom with gesture support and snap points.',
     type: 'registry:ui',
     dependencies: ['react-native-gesture-handler', 'react-native-reanimated'],
-    registryDependencies: ['text', 'view'],
-    hooks: ['useColor'],
+    registryDependencies: ['glass', 'text', 'view'],
+    hooks: ['useColor', 'useKeyboardHeight'],
     theme: ['globals'],
     files: [
       {

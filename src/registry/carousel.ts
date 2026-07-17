@@ -7,12 +7,8 @@ export const carouselRegistry = {
     description:
       'A flexible carousel component with support for auto-play, indicators, arrows, and custom layouts.',
     type: 'registry:ui',
-    dependencies: [
-      'expo-blur',
-      'lucide-react-native',
-      'react-native-gesture-handler',
-    ],
-    registryDependencies: ['text'],
+    dependencies: ['expo-blur', 'lucide-react-native', 'react-native-gesture-handler'],
+    registryDependencies: ['text', 'view'],
     hooks: ['useColor'],
     theme: ['globals'],
     files: [

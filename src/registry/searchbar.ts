@@ -10,7 +10,7 @@ export const searchbarRegistry = {
     dependencies: ['lucide-react-native'],
     registryDependencies: ['icon', 'text', 'view'],
     hooks: ['useColor'],
-    theme: ['globals'],
+    theme: ['globals', 'typography'],
     files: [
       {
         type: 'registry:ui',

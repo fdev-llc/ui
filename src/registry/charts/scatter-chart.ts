@@ -8,14 +8,10 @@ export const scatterChartRegistry = {
     description:
       'A customizable scatter plot component with smooth animations and flexible styling for visualizing data relationships.',
     type: 'registry:ui',
-    dependencies: [
-      'react-native-svg',
-      'react-native-reanimated',
-      'react-native-gesture-handler',
-    ],
+    dependencies: ['react-native-reanimated', 'react-native-svg'],
     registryDependencies: [],
     hooks: ['useColor'],
-    theme: ['globals'],
+    theme: [],
     files: [
       {
         type: 'registry:ui',

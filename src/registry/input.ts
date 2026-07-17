@@ -8,9 +8,9 @@ export const inputRegistry = {
       'A styled text input component with label, validation, icons, and grouped layouts.',
     type: 'registry:ui',
     dependencies: ['lucide-react-native'],
-    registryDependencies: ['text', 'icon', 'view'],
+    registryDependencies: ['icon', 'text', 'view'],
     hooks: ['useColor'],
-    theme: ['globals'],
+    theme: ['colorUtils', 'globals', 'typography'],
     files: [
       {
         type: 'registry:ui',

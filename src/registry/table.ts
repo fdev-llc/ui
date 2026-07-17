@@ -10,7 +10,7 @@ export const tableRegistry = {
     dependencies: ['lucide-react-native'],
     registryDependencies: ['button', 'text', 'view'],
     hooks: ['useColor'],
-    theme: ['globals'],
+    theme: ['globals', 'typography'],
     files: [
       {
         type: 'registry:ui',

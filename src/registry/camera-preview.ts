@@ -7,20 +7,8 @@ export const cameraPreviewRegistry = {
     description:
       'A comprehensive camera component with capture, preview, and media management capabilities.',
     type: 'registry:ui',
-    dependencies: [
-      'expo-camera',
-      'expo-media-library',
-      'lucide-react-native',
-      'react-native-safe-area-context',
-    ],
-    registryDependencies: [
-      'button',
-      'text',
-      'view',
-      'image',
-      'video',
-      'camera',
-    ],
+    dependencies: ['expo-media-library', 'lucide-react-native', 'react-native-safe-area-context'],
+    registryDependencies: ['button', 'camera', 'image', 'text', 'video', 'view'],
     hooks: ['useColor'],
     theme: [],
     files: [

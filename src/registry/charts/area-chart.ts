@@ -8,14 +8,10 @@ export const areaChartRegistry = {
     description:
       'A customizable area chart component with gradient fills and smooth animations.',
     type: 'registry:ui',
-    dependencies: [
-      'react-native-svg',
-      'react-native-reanimated',
-      'react-native-gesture-handler',
-    ],
+    dependencies: [],
     registryDependencies: ['line-chart'],
-    hooks: ['useColor'],
-    theme: ['globals'],
+    hooks: [],
+    theme: [],
     files: [
       {
         type: 'registry:ui',

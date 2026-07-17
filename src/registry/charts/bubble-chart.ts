@@ -8,14 +8,10 @@ export const bubbleChartRegistry = {
     description:
       'A customizable bubble chart component with animations, size mapping, and interactive features.',
     type: 'registry:ui',
-    dependencies: [
-      'react-native-svg',
-      'react-native-reanimated',
-      'react-native-gesture-handler',
-    ],
+    dependencies: ['react-native-reanimated', 'react-native-svg'],
     registryDependencies: [],
     hooks: ['useColor'],
-    theme: ['globals'],
+    theme: [],
     files: [
       {
         type: 'registry:ui',

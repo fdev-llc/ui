@@ -47,21 +47,6 @@ export const hooksRegistry = {
     ],
   },
 
-  useModeToggle: {
-    name: 'useModeToggle',
-    description: 'useModeToggle',
-    type: 'registry:hook',
-    dependencies: [],
-    hooks: ['useColorScheme'],
-    files: [
-      {
-        type: 'registry:hook',
-        path: 'templates/hooks/useModeToggle.tsx',
-        target: 'hooks/useModeToggle.tsx',
-      },
-    ],
-  },
-
   useColor: {
     name: 'useColor',
     description: 'useColor',

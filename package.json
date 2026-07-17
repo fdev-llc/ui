@@ -20,7 +20,8 @@
     "clean": "rm -rf dist",
     "release:patch": "npm version patch && npm publish --access public",
     "release:minor": "npm version minor && npm publish --access public",
-    "release:major": "npm version major && npm publish --access public"
+    "release:major": "npm version major && npm publish --access public",
+    "smoke:templates": "tsc --noEmit -p tools/template-smoke/tsconfig.json"
   },
   "keywords": [
     "react-native",
@@ -59,15 +60,37 @@
     "validate-npm-package-name": "^5.0.0"
   },
   "devDependencies": {
+    "@react-navigation/bottom-tabs": "^7.2.0",
+    "@react-navigation/native": "^7.0.14",
     "@types/fs-extra": "^11.0.4",
     "@types/inquirer": "^9.0.7",
     "@types/jest": "^30.0.0",
     "@types/node": "^20.8.0",
+    "@types/react": "~19.2.10",
     "@types/validate-npm-package-name": "^4.0.2",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
     "eslint": "^8.0.0",
+    "expo": "^57.0.0",
+    "expo-audio": "~57.0.0",
+    "expo-blur": "~57.0.0",
+    "expo-camera": "~57.0.0",
+    "expo-document-picker": "~57.0.0",
+    "expo-haptics": "~57.0.0",
+    "expo-image": "~57.0.0",
+    "expo-image-picker": "~57.0.1",
+    "expo-linear-gradient": "~57.0.0",
+    "expo-media-library": "~57.0.0",
+    "expo-video": "~57.0.0",
+    "expo-web-browser": "~57.0.0",
     "jest": "^30.2.0",
+    "lucide-react-native": "^1.23.0",
+    "react": "19.2.3",
+    "react-native": "0.86.0",
+    "react-native-gesture-handler": "~2.32.0",
+    "react-native-reanimated": "4.5.0",
+    "react-native-safe-area-context": "~5.7.0",
+    "react-native-svg": "15.15.4",
     "ts-jest": "^29.4.6",
     "typescript": "^5.2.2"
   }

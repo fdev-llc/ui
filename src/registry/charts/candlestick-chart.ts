@@ -8,14 +8,10 @@ export const candlestickChartRegistry = {
     description:
       'A customizable candlestick chart component with animations for financial data visualization.',
     type: 'registry:ui',
-    dependencies: [
-      'react-native-svg',
-      'react-native-reanimated',
-      'react-native-gesture-handler',
-    ],
+    dependencies: ['react-native-reanimated', 'react-native-svg'],
     registryDependencies: [],
     hooks: ['useColor'],
-    theme: ['globals'],
+    theme: [],
     files: [
       {
         type: 'registry:ui',

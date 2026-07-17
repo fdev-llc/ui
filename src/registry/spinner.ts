@@ -7,7 +7,7 @@ export const spinnerRegistry = {
     description:
       'A loading indicator component with multiple variants and customization options.',
     type: 'registry:ui',
-    dependencies: ['lucide-react-native'],
+    dependencies: ['lucide-react-native', 'react-native-reanimated'],
     registryDependencies: ['text'],
     hooks: ['useColor'],
     theme: ['globals'],

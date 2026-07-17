@@ -8,14 +8,10 @@ export const pieChartRegistry = {
     description:
       'A customizable pie chart component with smooth animations and flexible styling.',
     type: 'registry:ui',
-    dependencies: [
-      'react-native-svg',
-      'react-native-reanimated',
-      'react-native-gesture-handler',
-    ],
-    registryDependencies: [],
+    dependencies: ['react-native-reanimated', 'react-native-svg'],
+    registryDependencies: ['text'],
     hooks: ['useColor'],
-    theme: ['globals'],
+    theme: [],
     files: [
       {
         type: 'registry:ui',

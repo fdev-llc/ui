@@ -7,7 +7,7 @@ export const iconRegistry = {
     description:
       'A themed icon component with support for Lucide React Native icons.',
     type: 'registry:ui',
-    dependencies: ['lucide-react-native', 'react-native-svg'],
+    dependencies: ['lucide-react-native'],
     registryDependencies: ['text', 'view'],
     hooks: ['useColor'],
     theme: [],

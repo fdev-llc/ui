@@ -8,12 +8,8 @@ export const buttonRegistry = {
     description:
       'A versatile button component with multiple variants, sizes, and interactive animations.',
     type: 'registry:ui',
-    dependencies: [
-      'expo-haptics',
-      'lucide-react-native',
-      'react-native-reanimated',
-    ],
-    registryDependencies: ['text', 'icon', 'spinner'],
+    dependencies: ['expo-haptics', 'lucide-react-native', 'react-native-reanimated'],
+    registryDependencies: ['icon', 'spinner', 'text'],
     hooks: ['useColor'],
     theme: ['globals'],
     files: [

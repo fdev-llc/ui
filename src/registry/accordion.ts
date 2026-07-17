@@ -8,7 +8,7 @@ export const accordionRegistry = {
       'A vertically stacked set of interactive headings that each reveal a section of content.',
     type: 'registry:ui',
     dependencies: ['lucide-react-native'],
-    registryDependencies: ['text', 'view', 'icon'],
+    registryDependencies: ['icon', 'text', 'view'],
     hooks: [],
     theme: [],
     files: [

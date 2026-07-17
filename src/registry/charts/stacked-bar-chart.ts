@@ -8,14 +8,10 @@ export const stackedBarChartRegistry = {
     description:
       'A customizable stacked bar chart component with smooth animations, support for both horizontal and vertical layouts, and flexible styling.',
     type: 'registry:ui',
-    dependencies: [
-      'react-native-svg',
-      'react-native-reanimated',
-      'react-native-gesture-handler',
-    ],
+    dependencies: ['react-native-reanimated', 'react-native-svg'],
     registryDependencies: [],
     hooks: ['useColor'],
-    theme: ['globals'],
+    theme: [],
     files: [
       {
         type: 'registry:ui',

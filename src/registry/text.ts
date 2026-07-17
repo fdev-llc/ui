@@ -10,7 +10,7 @@ export const textRegistry = {
     dependencies: [],
     registryDependencies: [],
     hooks: ['useColor'],
-    theme: ['globals'],
+    theme: ['globals', 'typography'],
     files: [
       {
         type: 'registry:ui',

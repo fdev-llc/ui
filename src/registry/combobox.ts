@@ -10,7 +10,7 @@ export const comboboxRegistry = {
     dependencies: ['lucide-react-native'],
     registryDependencies: ['text', 'view'],
     hooks: ['useColor'],
-    theme: ['globals'],
+    theme: ['globals', 'typography'],
     files: [
       {
         type: 'registry:ui',

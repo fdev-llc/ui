@@ -24,6 +24,7 @@ import { comboboxRegistry } from './combobox.js';
 import { datePickerRegistry } from './date-picker.js';
 import { filePickerRegistry } from './file-picker.js';
 import { galleryRegistry } from './gallery.js';
+import { glassRegistry } from './glass.js';
 import { helloWaveRegistry } from './hello-wave.js';
 import { iconRegistry } from './icon.js';
 import { imageRegistry } from './image.js';
@@ -84,6 +85,7 @@ export const REGISTRY: Record<string, ComponentRegistry> = {
   ...datePickerRegistry,
   ...filePickerRegistry,
   ...galleryRegistry,
+  ...glassRegistry,
   ...helloWaveRegistry,
   ...iconRegistry,
   ...imageRegistry,

@@ -7,7 +7,7 @@ export const avatarRegistry = {
     description: 'An image element with a fallback for representing the user.',
     type: 'registry:ui',
     dependencies: ['expo-image'],
-    registryDependencies: ['text', 'view', 'image'],
+    registryDependencies: ['image', 'text', 'view'],
     hooks: ['useColor'],
     theme: ['globals'],
     files: [

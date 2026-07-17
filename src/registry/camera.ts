@@ -7,12 +7,8 @@ export const cameraRegistry = {
     description:
       'A powerful camera component with advanced features like zoom, timer, torch, and video recording.',
     type: 'registry:ui',
-    dependencies: [
-      'expo-camera',
-      'lucide-react-native',
-      'react-native-gesture-handler',
-    ],
-    registryDependencies: ['button', 'text', 'progress'],
+    dependencies: ['expo-camera', 'lucide-react-native', 'react-native-gesture-handler', 'react-native-reanimated'],
+    registryDependencies: ['button', 'progress', 'text'],
     hooks: ['useColor'],
     theme: ['globals'],
     files: [

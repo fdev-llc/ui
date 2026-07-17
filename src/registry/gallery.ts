@@ -7,12 +7,7 @@ export const galleryRegistry = {
     description:
       'A responsive image gallery component with fullscreen viewing, zoom, and gesture support.',
     type: 'registry:ui',
-    dependencies: [
-      'expo-image',
-      'lucide-react-native',
-      'react-native-gesture-handler',
-      'react-native-reanimated',
-    ],
+    dependencies: ['expo-image', 'lucide-react-native', 'react-native-gesture-handler', 'react-native-reanimated'],
     registryDependencies: ['button', 'text'],
     hooks: ['useColor'],
     theme: ['globals'],

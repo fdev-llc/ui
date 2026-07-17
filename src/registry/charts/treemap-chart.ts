@@ -8,14 +8,10 @@ export const treemapChartRegistry = {
     description:
       'A customizable treemap chart component with hierarchical data visualization, smooth animations, and flexible styling using the squarified treemap algorithm.',
     type: 'registry:ui',
-    dependencies: [
-      'react-native-svg',
-      'react-native-reanimated',
-      'react-native-gesture-handler',
-    ],
+    dependencies: ['react-native-reanimated', 'react-native-svg'],
     registryDependencies: [],
     hooks: ['useColor'],
-    theme: ['globals'],
+    theme: [],
     files: [
       {
         type: 'registry:ui',

@@ -8,14 +8,10 @@ export const doughnutChartRegistry = {
     description:
       'A customizable doughnut chart component with smooth animations, interactive legends, and flexible styling.',
     type: 'registry:ui',
-    dependencies: [
-      'react-native-svg',
-      'react-native-reanimated',
-      'react-native-gesture-handler',
-    ],
+    dependencies: ['react-native-reanimated', 'react-native-svg'],
     registryDependencies: ['text'],
     hooks: ['useColor'],
-    theme: ['globals'],
+    theme: [],
     files: [
       {
         type: 'registry:ui',

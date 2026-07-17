@@ -9,7 +9,7 @@ export const inputOtpRegistry = {
     type: 'registry:ui',
     registryDependencies: ['text'],
     hooks: ['useColor'],
-    theme: ['globals'],
+    theme: ['colorUtils', 'globals'],
     files: [
       {
         type: 'registry:ui',

@@ -7,12 +7,7 @@ export const mediaPickerRegistry = {
     description:
       'A versatile component for selecting images and videos from device gallery or camera with preview capabilities.',
     type: 'registry:ui',
-    dependencies: [
-      'expo-image',
-      'expo-image-picker',
-      'expo-media-library',
-      'lucide-react-native',
-    ],
+    dependencies: ['expo-image', 'expo-image-picker', 'expo-media-library', 'lucide-react-native'],
     registryDependencies: ['button', 'text', 'view'],
     hooks: ['useColor'],
     theme: ['globals'],

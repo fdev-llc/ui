@@ -8,14 +8,10 @@ export const stackedAreaChartRegistry = {
     description:
       'A customizable stacked area chart component with smooth animations and gradient fills for visualizing multiple data series over time.',
     type: 'registry:ui',
-    dependencies: [
-      'react-native-svg',
-      'react-native-reanimated',
-      'react-native-gesture-handler',
-    ],
+    dependencies: ['react-native-reanimated', 'react-native-svg'],
     registryDependencies: [],
     hooks: ['useColor'],
-    theme: ['globals'],
+    theme: [],
     files: [
       {
         type: 'registry:ui',

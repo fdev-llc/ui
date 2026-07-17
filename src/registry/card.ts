@@ -8,7 +8,7 @@ export const cardRegistry = {
     description: 'Displays a card with header, content, and footer.',
     type: 'registry:ui',
     dependencies: [],
-    registryDependencies: ['text', 'view'],
+    registryDependencies: ['glass', 'text', 'view'],
     hooks: ['useColor'],
     theme: ['globals'],
     files: [

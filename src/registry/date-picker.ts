@@ -8,14 +8,7 @@ export const datePickerRegistry = {
       'A customizable date and time picker component with bottom sheet UI.',
     type: 'registry:ui',
     dependencies: ['lucide-react-native'],
-    registryDependencies: [
-      'bottom-sheet',
-      'button',
-      'icon',
-      'scroll-view',
-      'text',
-      'view',
-    ],
+    registryDependencies: ['bottom-sheet', 'button', 'icon', 'scroll-view', 'text', 'view'],
     hooks: ['useColor'],
     theme: ['globals'],
     files: [

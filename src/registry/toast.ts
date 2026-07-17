@@ -7,13 +7,9 @@ export const toastRegistry = {
     description:
       'A succinct message that is displayed temporarily with Dynamic Island animation inspired by iOS.',
     type: 'registry:ui',
-    dependencies: [
-      'react-native-gesture-handler',
-      'react-native-reanimated',
-      'lucide-react-native',
-    ],
-    registryDependencies: ['text'],
-    hooks: [],
+    dependencies: ['lucide-react-native', 'react-native-gesture-handler', 'react-native-reanimated'],
+    registryDependencies: ['glass', 'text'],
+    hooks: ['useColor'],
     theme: [],
     files: [
       {

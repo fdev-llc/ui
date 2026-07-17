@@ -7,12 +7,7 @@ export const colorPickerRegistry = {
     description:
       'A color picker component with HSV color space selection and swatch display.',
     type: 'registry:ui',
-    dependencies: [
-      'expo-linear-gradient',
-      'react-native-gesture-handler',
-      'react-native-reanimated',
-      'react-native-svg',
-    ],
+    dependencies: ['expo-linear-gradient', 'react-native-gesture-handler', 'react-native-reanimated', 'react-native-svg'],
     registryDependencies: ['text', 'view'],
     hooks: ['useColor'],
     theme: ['globals'],

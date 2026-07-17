@@ -7,7 +7,7 @@ export const videoRegistry = {
     description:
       'A video player component with custom controls, gestures, and subtitle support.',
     type: 'registry:ui',
-    dependencies: ['expo-video', 'lucide-react-native'],
+    dependencies: ['expo', 'expo-video', 'lucide-react-native', 'react-native-gesture-handler', 'react-native-reanimated'],
     registryDependencies: ['progress', 'text', 'view'],
     hooks: ['useColor'],
     theme: ['globals'],
