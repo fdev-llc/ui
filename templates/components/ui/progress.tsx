@@ -1,24 +1,25 @@
-import { View } from '@/components/ui/view';
-import { useColor } from '@/hooks/useColor';
-import { HEIGHT } from '@/theme/globals';
-import React, { useEffect } from 'react';
-import { ViewStyle } from 'react-native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import React, { useEffect } from "react"
+import { ViewStyle } from "react-native"
+import { Gesture, GestureDetector } from "react-native-gesture-handler"
 import Animated, {
   runOnJS,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
-} from 'react-native-reanimated';
+} from "react-native-reanimated"
+
+import { View } from "@/components/ui/view"
+import { useColor } from "@/hooks/useColor"
+import { HEIGHT } from "@/theme/globals"
 
 interface ProgressProps {
-  value: number; // 0-100
-  style?: ViewStyle;
-  height?: number;
-  onValueChange?: (value: number) => void;
-  onSeekStart?: () => void;
-  onSeekEnd?: () => void;
-  interactive?: boolean;
+  value: number // 0-100
+  style?: ViewStyle
+  height?: number
+  onValueChange?: (value: number) => void
+  onSeekStart?: () => void
+  onSeekEnd?: () => void
+  interactive?: boolean
 }
 
 export function Progress({
@@ -30,98 +31,98 @@ export function Progress({
   onSeekEnd,
   interactive = false,
 }: ProgressProps) {
-  const primaryColor = useColor('primary');
-  const mutedColor = useColor('muted');
+  const primaryColor = useColor("primary")
+  const mutedColor = useColor("muted")
 
-  const clampedValue = Math.max(0, Math.min(100, value));
-  const progressWidth = useSharedValue(clampedValue);
-  const containerWidth = useSharedValue(200); // Default width, will be updated
-  const isDragging = useSharedValue(false);
+  const clampedValue = Math.max(0, Math.min(100, value))
+  const progressWidth = useSharedValue(clampedValue)
+  const containerWidth = useSharedValue(200) // Default width, will be updated
+  const isDragging = useSharedValue(false)
 
   // Update animation when value prop changes (only if not dragging)
   useEffect(() => {
     if (!isDragging.value) {
-      progressWidth.value = withTiming(clampedValue, { duration: 300 });
+      progressWidth.value = withTiming(clampedValue, { duration: 300 })
     }
-  }, [clampedValue]);
+  }, [clampedValue])
 
   const updateValue = (newValue: number) => {
-    const clamped = Math.max(0, Math.min(100, newValue));
-    onValueChange?.(clamped);
-  };
+    const clamped = Math.max(0, Math.min(100, newValue))
+    onValueChange?.(clamped)
+  }
 
   const handleSeekStart = () => {
-    isDragging.value = true;
-    onSeekStart?.();
-  };
+    isDragging.value = true
+    onSeekStart?.()
+  }
 
   const handleSeekEnd = () => {
-    isDragging.value = false;
-    onSeekEnd?.();
-  };
+    isDragging.value = false
+    onSeekEnd?.()
+  }
 
   // Create pan gesture using the new Gesture API
   const panGesture = Gesture.Pan()
     .onStart(() => {
-      if (!interactive) return;
-      runOnJS(handleSeekStart)();
+      if (!interactive) return
+      runOnJS(handleSeekStart)()
     })
     .onUpdate((event) => {
-      if (!interactive) return;
+      if (!interactive) return
 
       // Calculate new progress based on gesture position
-      const newProgress = (event.x / containerWidth.value) * 100;
-      const clampedProgress = Math.max(0, Math.min(100, newProgress));
+      const newProgress = (event.x / containerWidth.value) * 100
+      const clampedProgress = Math.max(0, Math.min(100, newProgress))
 
-      progressWidth.value = clampedProgress;
-      runOnJS(updateValue)(clampedProgress);
+      progressWidth.value = clampedProgress
+      runOnJS(updateValue)(clampedProgress)
     })
     .onEnd(() => {
-      if (!interactive) return;
-      runOnJS(handleSeekEnd)();
-    });
+      if (!interactive) return
+      runOnJS(handleSeekEnd)()
+    })
 
   // Create tap gesture for direct seeking
   const tapGesture = Gesture.Tap().onStart((event) => {
-    if (!interactive) return;
+    if (!interactive) return
 
-    runOnJS(handleSeekStart)();
+    runOnJS(handleSeekStart)()
 
     // Calculate progress based on tap position
-    const newProgress = (event.x / containerWidth.value) * 100;
-    const clampedProgress = Math.max(0, Math.min(100, newProgress));
+    const newProgress = (event.x / containerWidth.value) * 100
+    const clampedProgress = Math.max(0, Math.min(100, newProgress))
 
-    progressWidth.value = withTiming(clampedProgress, { duration: 200 });
-    runOnJS(updateValue)(clampedProgress);
+    progressWidth.value = withTiming(clampedProgress, { duration: 200 })
+    runOnJS(updateValue)(clampedProgress)
 
     setTimeout(() => {
-      runOnJS(handleSeekEnd)();
-    }, 200);
-  });
+      runOnJS(handleSeekEnd)()
+    }, 200)
+  })
 
   // Combine gestures
-  const combinedGesture = Gesture.Race(panGesture, tapGesture);
+  const combinedGesture = Gesture.Race(panGesture, tapGesture)
 
   const animatedProgressStyle = useAnimatedStyle(() => {
     return {
       width: `${progressWidth.value}%`,
-    };
-  });
+    }
+  })
 
   const containerStyle: ViewStyle[] = [
     {
       height: height,
-      width: '100%' as const,
+      width: "100%" as const,
       backgroundColor: mutedColor,
       borderRadius: height / 2,
-      overflow: 'hidden' as const,
+      overflow: "hidden" as const,
     },
     ...(style ? [style] : []),
-  ];
+  ]
 
   const onLayout = (event: any) => {
-    containerWidth.value = event.nativeEvent.layout.width;
-  };
+    containerWidth.value = event.nativeEvent.layout.width
+  }
 
   if (interactive) {
     return (
@@ -130,7 +131,7 @@ export function Progress({
           <Animated.View
             style={[
               {
-                height: '100%' as const,
+                height: "100%" as const,
                 backgroundColor: primaryColor,
                 borderRadius: height / 2,
               },
@@ -139,7 +140,7 @@ export function Progress({
           />
         </Animated.View>
       </GestureDetector>
-    );
+    )
   }
 
   return (
@@ -147,7 +148,7 @@ export function Progress({
       <Animated.View
         style={[
           {
-            height: '100%' as const,
+            height: "100%" as const,
             backgroundColor: primaryColor,
             borderRadius: height / 2,
           },
@@ -155,5 +156,5 @@ export function Progress({
         ]}
       />
     </View>
-  );
+  )
 }

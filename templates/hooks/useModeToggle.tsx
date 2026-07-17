@@ -1,44 +1,46 @@
-import { useColorScheme } from '@/hooks/useColorScheme';
-import { useState } from 'react';
-import { Appearance, ColorSchemeName } from 'react-native';
+import { useState } from "react"
+import { Appearance, ColorSchemeName } from "react-native"
 
-type Mode = 'light' | 'dark' | 'system';
+import { useColorScheme } from "@/hooks/useColorScheme"
+
+type Mode = "light" | "dark" | "system"
 
 interface UseModeToggleReturn {
-  isDark: boolean;
-  mode: Mode;
-  setMode: (mode: Mode) => void;
-  currentMode: ColorSchemeName;
-  toggleMode: () => void;
+  isDark: boolean
+  mode: Mode
+  setMode: (mode: Mode) => void
+  currentMode: ColorSchemeName
+  toggleMode: () => void
 }
 
 export function useModeToggle(): UseModeToggleReturn {
-  const [mode, setModeState] = useState<Mode>('system');
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === 'dark';
+  const [mode, setModeState] = useState<Mode>("system")
+  const colorScheme = useColorScheme()
+  const isDark = colorScheme === "dark"
 
   const toggleMode = () => {
     switch (mode) {
-      case 'light':
-        setMode('dark');
-        break;
-      case 'dark':
-        setMode('system');
-        break;
-      case 'system':
-        setMode('light');
-        break;
+      case "light":
+        setMode("dark")
+        break
+      case "dark":
+        setMode("system")
+        break
+      case "system":
+        setMode("light")
+        break
     }
-  };
+  }
 
   const setMode = (newMode: Mode) => {
-    setModeState(newMode);
-    if (newMode === 'system') {
-      Appearance.setColorScheme(null); // Reset to system default
+    setModeState(newMode)
+    if (newMode === "system") {
+      // RN 0.86: "unspecified" (not null) resets to the system default
+      Appearance.setColorScheme("unspecified")
     } else {
-      Appearance.setColorScheme(newMode);
+      Appearance.setColorScheme(newMode)
     }
-  };
+  }
 
   return {
     isDark,
@@ -46,5 +48,5 @@ export function useModeToggle(): UseModeToggleReturn {
     setMode,
     currentMode: colorScheme,
     toggleMode,
-  };
+  }
 }

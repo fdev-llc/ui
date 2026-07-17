@@ -1,8 +1,4 @@
-import { Text } from '@/components/ui/text';
-import { View } from '@/components/ui/view';
-import { useColor } from '@/hooks/useColor';
-import { CORNERS, FONT_SIZE } from '@/theme/globals';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react"
 import {
   ActionSheetIOS,
   Dimensions,
@@ -13,7 +9,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ViewStyle,
-} from 'react-native';
+} from "react-native"
 import Animated, {
   Easing,
   interpolate,
@@ -21,24 +17,29 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withTiming,
-} from 'react-native-reanimated';
+} from "react-native-reanimated"
+
+import { Text } from "@/components/ui/text"
+import { View } from "@/components/ui/view"
+import { useColor } from "@/hooks/useColor"
+import { CORNERS, FONT_SIZE } from "@/theme/globals"
 
 export interface ActionSheetOption {
-  title: string;
-  onPress: () => void;
-  destructive?: boolean;
-  disabled?: boolean;
-  icon?: React.ReactNode;
+  title: string
+  onPress: () => void
+  destructive?: boolean
+  disabled?: boolean
+  icon?: React.ReactNode
 }
 
 interface ActionSheetProps {
-  visible: boolean;
-  onClose: () => void;
-  title?: string;
-  message?: string;
-  options: ActionSheetOption[];
-  cancelButtonTitle?: string;
-  style?: ViewStyle;
+  visible: boolean
+  onClose: () => void
+  title?: string
+  message?: string
+  options: ActionSheetOption[]
+  cancelButtonTitle?: string
+  style?: ViewStyle
 }
 
 export function ActionSheet({
@@ -47,20 +48,18 @@ export function ActionSheet({
   title,
   message,
   options,
-  cancelButtonTitle = 'Cancel',
+  cancelButtonTitle = "Cancel",
   style,
 }: ActionSheetProps) {
   // Use iOS native ActionSheet on iOS
-  if (Platform.OS === 'ios') {
+  if (Platform.OS === "ios") {
     useEffect(() => {
       if (visible) {
-        const optionTitles = options.map((option) => option.title);
-        const destructiveButtonIndex = options.findIndex(
-          (option) => option.destructive
-        );
+        const optionTitles = options.map((option) => option.title)
+        const destructiveButtonIndex = options.findIndex((option) => option.destructive)
         const disabledButtonIndices = options
           .map((option, index) => (option.disabled ? index : -1))
-          .filter((index) => index !== -1);
+          .filter((index) => index !== -1)
 
         ActionSheetIOS.showActionSheetWithOptions(
           {
@@ -69,26 +68,22 @@ export function ActionSheet({
             options: [...optionTitles, cancelButtonTitle],
             cancelButtonIndex: optionTitles.length,
             destructiveButtonIndex:
-              destructiveButtonIndex !== -1
-                ? destructiveButtonIndex
-                : undefined,
+              destructiveButtonIndex !== -1 ? destructiveButtonIndex : undefined,
             disabledButtonIndices:
-              disabledButtonIndices.length > 0
-                ? disabledButtonIndices
-                : undefined,
+              disabledButtonIndices.length > 0 ? disabledButtonIndices : undefined,
           },
           (buttonIndex) => {
             if (buttonIndex < optionTitles.length) {
-              options[buttonIndex].onPress();
+              options[buttonIndex].onPress()
             }
-            onClose();
-          }
-        );
+            onClose()
+          },
+        )
       }
-    }, [visible, title, message, options, cancelButtonTitle, onClose]);
+    }, [visible, title, message, options, cancelButtonTitle, onClose])
 
     // Return null for iOS as we use the native ActionSheet
-    return null;
+    return null
   }
 
   // Custom implementation for Android and other platforms
@@ -104,7 +99,7 @@ export function ActionSheet({
         style,
       }}
     />
-  );
+  )
 }
 
 // Custom ActionSheet implementation for Android using react-native-reanimated
@@ -117,23 +112,23 @@ function AndroidActionSheet({
   cancelButtonTitle,
   style,
 }: ActionSheetProps) {
-  const [isSheetVisible, setIsSheetVisible] = useState(visible);
-  const progress = useSharedValue(0);
-  const screenHeight = Dimensions.get('window').height;
+  const [isSheetVisible, setIsSheetVisible] = useState(visible)
+  const progress = useSharedValue(0)
+  const screenHeight = Dimensions.get("window").height
 
-  const cardColor = useColor('card');
-  const textColor = useColor('text');
-  const mutedColor = useColor('textMuted');
-  const borderColor = useColor('border');
-  const destructiveColor = useColor('red');
+  const cardColor = useColor("card")
+  const textColor = useColor("text")
+  const mutedColor = useColor("textMuted")
+  const borderColor = useColor("border")
+  const destructiveColor = useColor("red")
 
   useEffect(() => {
     if (visible) {
-      setIsSheetVisible(true);
+      setIsSheetVisible(true)
       progress.value = withTiming(1, {
         duration: 300,
         easing: Easing.out(Easing.quad),
-      });
+      })
     } else {
       // Animate out, then set the modal to invisible after the animation is done
       progress.value = withTiming(
@@ -141,82 +136,68 @@ function AndroidActionSheet({
         { duration: 250, easing: Easing.in(Easing.quad) },
         (finished) => {
           if (finished) {
-            runOnJS(setIsSheetVisible)(false);
+            runOnJS(setIsSheetVisible)(false)
           }
-        }
-      );
+        },
+      )
     }
-  }, [visible, progress]);
+  }, [visible, progress])
 
   // Animated style for the backdrop
   const backdropAnimatedStyle = useAnimatedStyle(() => ({
     opacity: progress.value,
-  }));
+  }))
 
   // Animated style for the sheet itself (slide up/down)
   const sheetAnimatedStyle = useAnimatedStyle(() => {
-    const translateY = interpolate(progress.value, [0, 1], [screenHeight, 0]);
+    const translateY = interpolate(progress.value, [0, 1], [screenHeight, 0])
     return {
       transform: [{ translateY }],
-    };
-  });
+    }
+  })
 
   const handleOptionPress = (option: ActionSheetOption) => {
     if (!option.disabled) {
-      option.onPress();
-      onClose();
+      option.onPress()
+      onClose()
     }
-  };
+  }
 
   const handleBackdropPress = () => {
-    onClose();
-  };
+    onClose()
+  }
 
   // Render null if the sheet is not supposed to be visible
   if (!isSheetVisible) {
-    return null;
+    return null
   }
 
   return (
     <Modal
       transparent
       visible={isSheetVisible}
-      animationType='none'
+      animationType="none"
       statusBarTranslucent
       onRequestClose={onClose}
     >
       <View style={styles.container}>
         <Animated.View style={[styles.backdrop, backdropAnimatedStyle]}>
-          <Pressable
-            style={styles.backdropPressable}
-            onPress={handleBackdropPress}
-          />
+          <Pressable style={styles.backdropPressable} onPress={handleBackdropPress} />
         </Animated.View>
 
         <Animated.View
-          style={[
-            styles.sheet,
-            { backgroundColor: cardColor },
-            sheetAnimatedStyle,
-            style,
-          ]}
+          style={[styles.sheet, { backgroundColor: cardColor }, sheetAnimatedStyle, style]}
         >
           {/* Header */}
           {(title || message) && (
             <View style={styles.header}>
               {title && (
-                <Text
-                  style={[styles.title, { color: textColor }]}
-                  numberOfLines={2}
-                >
+                <Text style={[styles.title, { color: textColor }]} numberOfLines={2}>
                   {title}
                 </Text>
               )}
               {message && (
-                <Text
-                  style={[styles.message, { color: mutedColor }]}
-                  numberOfLines={3}
-                >
+                <Text style={[styles.message, { color: mutedColor }]} numberOfLines={3}>
                   {message}
                 </Text>
               )}
@@ -224,10 +205,7 @@ function AndroidActionSheet({
           )}
 
           {/* Options */}
-          <ScrollView
-            style={styles.optionsContainer}
-            showsVerticalScrollIndicator={false}
-          >
+          <ScrollView style={styles.optionsContainer} showsVerticalScrollIndicator={false}>
             {options.map((option, index) => (
               <TouchableOpacity
                 key={index}
@@ -242,9 +220,7 @@ function AndroidActionSheet({
                 activeOpacity={0.6}
               >
                 <View style={styles.optionContent}>
-                  {option.icon && (
-                    <View style={styles.optionIcon}>{option.icon}</View>
-                  )}
+                  {option.icon && <View style={styles.optionIcon}>{option.icon}</View>}
                   <Text
                     style={[
                       styles.optionText,
@@ -252,8 +228,8 @@ function AndroidActionSheet({
                         color: option.destructive
                           ? destructiveColor
                           : option.disabled
-                          ? mutedColor
-                          : textColor,
+                            ? mutedColor
+                            : textColor,
                       },
                     ]}
                     numberOfLines={1}
@@ -266,44 +242,94 @@ function AndroidActionSheet({
           </ScrollView>
 
           {/* Cancel Button */}
-          <View
-            style={[styles.cancelContainer, { borderTopColor: borderColor }]}
-          >
-            <TouchableOpacity
-              style={styles.cancelButton}
-              onPress={onClose}
-              activeOpacity={0.6}
-            >
-              <Text style={[styles.cancelText, { color: textColor }]}>
-                {cancelButtonTitle}
-              </Text>
+          <View style={[styles.cancelContainer, { borderTopColor: borderColor }]}>
+            <TouchableOpacity style={styles.cancelButton} onPress={onClose} activeOpacity={0.6}>
+              <Text style={[styles.cancelText, { color: textColor }]}>{cancelButtonTitle}</Text>
             </TouchableOpacity>
           </View>
         </Animated.View>
       </View>
     </Modal>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'flex-end',
-  },
   backdrop: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    bottom: 0,
+    left: 0,
+    position: "absolute",
+    right: 0,
+    top: 0,
   },
   backdropPressable: {
     flex: 1,
+  },
+  cancelButton: {
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+  },
+  cancelContainer: {
+    borderTopWidth: StyleSheet.hairlineWidth,
+    marginTop: 8,
+  },
+  cancelText: {
+    fontSize: FONT_SIZE,
+    fontWeight: "600",
+  },
+  container: {
+    flex: 1,
+    justifyContent: "flex-end",
+  },
+  disabledOption: {
+    opacity: 0.5,
+  },
+  header: {
+    alignItems: "center",
+    paddingBottom: 16,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+  },
+  lastOption: {
+    borderBottomWidth: 0,
+  },
+  message: {
+    fontSize: FONT_SIZE - 1,
+    lineHeight: 20,
+    textAlign: "center",
+  },
+  option: {
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+  },
+  optionContent: {
+    alignItems: "center",
+    flexDirection: "row",
+  },
+  optionIcon: {
+    alignItems: "center",
+    height: 24,
+    justifyContent: "center",
+    marginRight: 12,
+    width: 24,
+  },
+  optionText: {
+    flex: 1,
+    fontSize: FONT_SIZE,
+    fontWeight: "500",
+  },
+  optionsContainer: {
+    maxHeight: 300,
   },
   sheet: {
     borderTopLeftRadius: CORNERS,
     borderTopRightRadius: CORNERS,
     paddingBottom: 34, // Safe area bottom padding
-    maxHeight: '80%',
+    maxHeight: "80%",
     elevation: 10,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: -2,
@@ -311,98 +337,42 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 10,
   },
-  header: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 16,
-    alignItems: 'center',
-  },
   title: {
     fontSize: 18,
-    fontWeight: '600',
-    textAlign: 'center',
+    fontWeight: "600",
     marginBottom: 4,
+    textAlign: "center",
   },
-  message: {
-    fontSize: FONT_SIZE - 1,
-    textAlign: 'center',
-    lineHeight: 20,
-  },
-  optionsContainer: {
-    maxHeight: 300,
-  },
-  option: {
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-  },
-  lastOption: {
-    borderBottomWidth: 0,
-  },
-  disabledOption: {
-    opacity: 0.5,
-  },
-  optionContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  optionIcon: {
-    marginRight: 12,
-    width: 24,
-    height: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  optionText: {
-    fontSize: FONT_SIZE,
-    fontWeight: '500',
-    flex: 1,
-  },
-  cancelContainer: {
-    borderTopWidth: StyleSheet.hairlineWidth,
-    marginTop: 8,
-  },
-  cancelButton: {
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    alignItems: 'center',
-  },
-  cancelText: {
-    fontSize: FONT_SIZE,
-    fontWeight: '600',
-  },
-});
+})
 
 // Hook for easier ActionSheet usage (No changes needed here)
 export function useActionSheet() {
-  const [isVisible, setIsVisible] = React.useState(false);
-  const [config, setConfig] = React.useState<
-    Omit<ActionSheetProps, 'visible' | 'onClose'>
-  >({
+  const [isVisible, setIsVisible] = React.useState(false)
+  const [config, setConfig] = React.useState<Omit<ActionSheetProps, "visible" | "onClose">>({
     options: [],
-  });
+  })
 
   const show = React.useCallback(
-    (actionSheetConfig: Omit<ActionSheetProps, 'visible' | 'onClose'>) => {
-      setConfig(actionSheetConfig);
-      setIsVisible(true);
+    (actionSheetConfig: Omit<ActionSheetProps, "visible" | "onClose">) => {
+      setConfig(actionSheetConfig)
+      setIsVisible(true)
     },
-    []
-  );
+    [],
+  )
 
   const hide = React.useCallback(() => {
-    setIsVisible(false);
-  }, []);
+    setIsVisible(false)
+  }, [])
 
   const ActionSheetComponent = React.useMemo(
     () => <ActionSheet visible={isVisible} onClose={hide} {...config} />,
-    [isVisible, hide, config]
-  );
+    [isVisible, hide, config],
+  )
 
   return {
     show,
     hide,
     ActionSheet: ActionSheetComponent,
     isVisible,
-  };
+  }
 }

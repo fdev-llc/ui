@@ -1,44 +1,45 @@
-import { useColor } from '@/hooks/useColor';
-import { useEffect, useState } from 'react';
-import { LayoutChangeEvent, View, ViewStyle } from 'react-native';
+import { useEffect, useState } from "react"
+import { LayoutChangeEvent, View, ViewStyle } from "react-native"
 import Animated, {
   useAnimatedProps,
   useSharedValue,
   withDelay,
   withSpring,
   withTiming,
-} from 'react-native-reanimated';
-import Svg, { Circle, G, Line, Text as SvgText } from 'react-native-svg';
+} from "react-native-reanimated"
+import Svg, { Circle, G, Line, Text as SvgText } from "react-native-svg"
+
+import { useColor } from "@/hooks/useColor"
 
 // Animated SVG Components
-const AnimatedCircle = Animated.createAnimatedComponent(Circle);
+const AnimatedCircle = Animated.createAnimatedComponent(Circle)
 
 interface ChartConfig {
-  width?: number;
-  height?: number;
-  padding?: number;
-  showGrid?: boolean;
-  showLabels?: boolean;
-  animated?: boolean;
-  duration?: number;
+  width?: number
+  height?: number
+  padding?: number
+  showGrid?: boolean
+  showLabels?: boolean
+  animated?: boolean
+  duration?: number
 }
 
 interface BubbleChartDataPoint {
-  x: number;
-  y: number;
-  size: number;
-  label?: string;
-  color?: string;
+  x: number
+  y: number
+  size: number
+  label?: string
+  color?: string
 }
 
 type Props = {
-  data: BubbleChartDataPoint[];
-  config?: ChartConfig;
-  style?: ViewStyle;
-};
+  data: BubbleChartDataPoint[]
+  config?: ChartConfig
+  style?: ViewStyle
+}
 
 export const BubbleChart = ({ data, config = {}, style }: Props) => {
-  const [containerWidth, setContainerWidth] = useState(300);
+  const [containerWidth, setContainerWidth] = useState(300)
 
   const {
     height = 200,
@@ -47,52 +48,52 @@ export const BubbleChart = ({ data, config = {}, style }: Props) => {
     showLabels = true,
     animated = true,
     duration = 800,
-  } = config;
+  } = config
 
-  const chartWidth = containerWidth || config.width || 300;
+  const chartWidth = containerWidth || config.width || 300
 
-  const primaryColor = useColor('primary');
-  const mutedColor = useColor('mutedForeground');
+  const primaryColor = useColor("primary")
+  const mutedColor = useColor("mutedForeground")
 
-  const animationProgress = useSharedValue(0);
+  const animationProgress = useSharedValue(0)
 
   const handleLayout = (event: LayoutChangeEvent) => {
-    const { width: measuredWidth } = event.nativeEvent.layout;
+    const { width: measuredWidth } = event.nativeEvent.layout
     if (measuredWidth > 0) {
-      setContainerWidth(measuredWidth);
+      setContainerWidth(measuredWidth)
     }
-  };
+  }
 
   useEffect(() => {
     if (animated) {
-      animationProgress.value = withTiming(1, { duration });
+      animationProgress.value = withTiming(1, { duration })
     } else {
-      animationProgress.value = 1;
+      animationProgress.value = 1
     }
-  }, [data, animated, duration]);
+  }, [data, animated, duration])
 
-  if (!data.length) return null;
+  if (!data.length) return null
 
-  const maxX = Math.max(...data.map((d) => d.x));
-  const minX = Math.min(...data.map((d) => d.x));
-  const maxY = Math.max(...data.map((d) => d.y));
-  const minY = Math.min(...data.map((d) => d.y));
-  const maxSize = Math.max(...data.map((d) => d.size));
+  const maxX = Math.max(...data.map((d) => d.x))
+  const minX = Math.min(...data.map((d) => d.x))
+  const maxY = Math.max(...data.map((d) => d.y))
+  const minY = Math.min(...data.map((d) => d.y))
+  const maxSize = Math.max(...data.map((d) => d.size))
 
-  const xRange = maxX - minX || 1;
-  const yRange = maxY - minY || 1;
+  const xRange = maxX - minX || 1
+  const yRange = maxY - minY || 1
 
-  const innerChartWidth = chartWidth - padding * 2;
-  const chartHeight = height - padding * 2;
+  const innerChartWidth = chartWidth - padding * 2
+  const chartHeight = height - padding * 2
 
   const colors = [
     primaryColor,
-    useColor('blue'),
-    useColor('green'),
-    useColor('orange'),
-    useColor('purple'),
-    useColor('pink'),
-  ];
+    useColor("blue"),
+    useColor("green"),
+    useColor("orange"),
+    useColor("purple"),
+    useColor("pink"),
+  ]
 
   // Convert data to screen coordinates
   const bubbles = data.map((point, index) => ({
@@ -101,10 +102,10 @@ export const BubbleChart = ({ data, config = {}, style }: Props) => {
     radius: (point.size / maxSize) * 20 + 5, // Scale bubble size
     color: point.color || colors[index % colors.length],
     label: point.label,
-  }));
+  }))
 
   return (
-    <View style={[{ width: '100%', height }, style]} onLayout={handleLayout}>
+    <View style={[{ width: "100%", height }, style]} onLayout={handleLayout}>
       <Svg width={chartWidth} height={height}>
         {/* Grid lines */}
         {showGrid && (
@@ -138,11 +139,8 @@ export const BubbleChart = ({ data, config = {}, style }: Props) => {
         {bubbles.map((bubble, index) => {
           const bubbleAnimatedProps = useAnimatedProps(() => ({
             opacity: animationProgress.value * 0.7,
-            r: withDelay(
-              index * 100,
-              withSpring(animationProgress.value * bubble.radius)
-            ),
-          }));
+            r: withDelay(index * 100, withSpring(animationProgress.value * bubble.radius)),
+          }))
 
           return (
             <G key={`bubble-${index}`}>
@@ -156,17 +154,17 @@ export const BubbleChart = ({ data, config = {}, style }: Props) => {
                 <SvgText
                   x={bubble.x}
                   y={bubble.y}
-                  textAnchor='middle'
+                  textAnchor="middle"
                   fontSize={10}
-                  fill='#FFFFFF'
-                  fontWeight='600'
-                  alignmentBaseline='middle'
+                  fill="#FFFFFF"
+                  fontWeight="600"
+                  alignmentBaseline="middle"
                 >
                   {bubble.label}
                 </SvgText>
               )}
             </G>
-          );
+          )
         })}
 
         {/* Axis labels */}
@@ -177,7 +175,7 @@ export const BubbleChart = ({ data, config = {}, style }: Props) => {
               key={`x-label-${index}`}
               x={padding + (index * innerChartWidth) / 2}
               y={height - 5}
-              textAnchor='middle'
+              textAnchor="middle"
               fontSize={12}
               fill={mutedColor}
             >
@@ -190,10 +188,10 @@ export const BubbleChart = ({ data, config = {}, style }: Props) => {
               key={`y-label-${index}`}
               x={15}
               y={padding + (index * chartHeight) / 2}
-              textAnchor='middle'
+              textAnchor="middle"
               fontSize={12}
               fill={mutedColor}
-              alignmentBaseline='middle'
+              alignmentBaseline="middle"
             >
               {Math.round(value)}
             </SvgText>
@@ -201,5 +199,5 @@ export const BubbleChart = ({ data, config = {}, style }: Props) => {
         </G>
       </Svg>
     </View>
-  );
-};
+  )
+}

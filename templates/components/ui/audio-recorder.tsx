@@ -1,18 +1,7 @@
-import { AudioPlayer } from '@/components/ui/audio-player';
-import { AudioWaveform } from '@/components/ui/audio-waveform';
-import { Button } from '@/components/ui/button';
-import { Text } from '@/components/ui/text';
-import { useColor } from '@/hooks/useColor';
-import { BORDER_RADIUS } from '@/theme/globals';
-import {
-  AudioModule,
-  RecordingOptions,
-  RecordingPresets,
-  useAudioRecorder,
-} from 'expo-audio';
-import { Circle, Download, Mic, Square, Trash2 } from 'lucide-react-native';
-import React, { useEffect, useRef, useState } from 'react';
-import { Alert, Platform, StyleSheet, View, ViewStyle } from 'react-native';
+import React, { useEffect, useRef, useState } from "react"
+import { Alert, StyleSheet, View, ViewStyle } from "react-native"
+import { AudioModule, RecordingOptions, RecordingPresets, useAudioRecorder } from "expo-audio"
+import { Circle, Download, Mic, Square, Trash2 } from "lucide-react-native"
 import Animated, {
   cancelAnimation,
   Easing,
@@ -20,23 +9,30 @@ import Animated, {
   useSharedValue,
   withRepeat,
   withTiming,
-} from 'react-native-reanimated';
+} from "react-native-reanimated"
+
+import { AudioPlayer } from "@/components/ui/audio-player"
+import { AudioWaveform } from "@/components/ui/audio-waveform"
+import { Button } from "@/components/ui/button"
+import { Text } from "@/components/ui/text"
+import { useColor } from "@/hooks/useColor"
+import { BORDER_RADIUS } from "@/theme/globals"
 
 export interface AudioRecorderProps {
-  style?: ViewStyle;
-  quality?: 'high' | 'low';
-  showWaveform?: boolean;
-  showTimer?: boolean;
-  maxDuration?: number; // in seconds
-  onRecordingComplete?: (uri: string) => void;
-  onRecordingStart?: () => void;
-  onRecordingStop?: () => void;
-  customRecordingOptions?: RecordingOptions;
+  style?: ViewStyle
+  quality?: "high" | "low"
+  showWaveform?: boolean
+  showTimer?: boolean
+  maxDuration?: number // in seconds
+  onRecordingComplete?: (uri: string) => void
+  onRecordingStart?: () => void
+  onRecordingStop?: () => void
+  customRecordingOptions?: RecordingOptions
 }
 
 export function AudioRecorder({
   style,
-  quality = 'high',
+  quality = "high",
   showWaveform = true,
   showTimer = true,
   maxDuration,
@@ -47,54 +43,50 @@ export function AudioRecorder({
 }: AudioRecorderProps) {
   const recordingOptions =
     customRecordingOptions ||
-    (quality === 'high'
-      ? RecordingPresets.HIGH_QUALITY
-      : RecordingPresets.LOW_QUALITY);
+    (quality === "high" ? RecordingPresets.HIGH_QUALITY : RecordingPresets.LOW_QUALITY)
 
-  const recorder = useAudioRecorder(recordingOptions);
-  const [permissionGranted, setPermissionGranted] = useState(false);
-  const [duration, setDuration] = useState(0);
-  const [recordingUri, setRecordingUri] = useState<string | null>(null);
-  const [isRecording, setIsRecording] = useState(false);
+  const recorder = useAudioRecorder(recordingOptions)
+  const [permissionGranted, setPermissionGranted] = useState(false)
+  const [duration, setDuration] = useState(0)
+  const [recordingUri, setRecordingUri] = useState<string | null>(null)
+  const [isRecording, setIsRecording] = useState(false)
 
   // Waveform data for real-time visualization
-  const [waveformData, setWaveformData] = useState<number[]>(
-    Array.from({ length: 30 }, () => 0.2)
-  );
+  const [waveformData, setWaveformData] = useState<number[]>(Array.from({ length: 30 }, () => 0.2))
 
   // Theme colors
-  const primaryColor = useColor('primary');
-  const secondaryColor = useColor('secondary');
-  const textColor = useColor('text');
-  const mutedColor = useColor('textMuted');
-  const redColor = useColor('red');
-  const greenColor = useColor('green');
+  const primaryColor = useColor("primary")
+  const secondaryColor = useColor("secondary")
+  const textColor = useColor("text")
+  const mutedColor = useColor("textMuted")
+  const redColor = useColor("red")
+  const greenColor = useColor("green")
 
   // Animation values using react-native-reanimated
-  const recordingPulse = useSharedValue(1);
-  const durationInterval = useRef<number | null>(null);
-  const meteringInterval = useRef<number | null>(null);
+  const recordingPulse = useSharedValue(1)
+  const durationInterval = useRef<ReturnType<typeof setInterval> | null>(null)
+  const meteringInterval = useRef<ReturnType<typeof setInterval> | null>(null)
 
   // Request permissions on mount
   useEffect(() => {
-    (async () => {
+    ;(async () => {
       try {
-        const status = await AudioModule.requestRecordingPermissionsAsync();
-        setPermissionGranted(status.granted);
+        const status = await AudioModule.requestRecordingPermissionsAsync()
+        setPermissionGranted(status.granted)
 
         if (!status.granted) {
           Alert.alert(
-            'Permission Required',
-            'Please grant microphone permission to record audio.',
-            [{ text: 'OK' }]
-          );
+            "Permission Required",
+            "Please grant microphone permission to record audio.",
+            [{ text: "OK" }],
+          )
         }
       } catch (error) {
-        console.error('Error requesting permissions:', error);
-        setPermissionGranted(false);
+        console.error("Error requesting permissions:", error)
+        setPermissionGranted(false)
       }
-    })();
-  }, []);
+    })()
+  }, [])
 
   // Recording pulse animation using react-native-reanimated
   useEffect(() => {
@@ -103,26 +95,26 @@ export function AudioRecorder({
       recordingPulse.value = withRepeat(
         withTiming(1.2, { duration: 600, easing: Easing.inOut(Easing.ease) }),
         -1, // Infinite loop
-        true // Reverse the animation (yoyo effect)
-      );
+        true, // Reverse the animation (yoyo effect)
+      )
     } else {
       // Stop the animation and reset the scale
-      cancelAnimation(recordingPulse);
-      recordingPulse.value = withTiming(1, { duration: 300 });
+      cancelAnimation(recordingPulse)
+      recordingPulse.value = withTiming(1, { duration: 300 })
     }
 
     return () => {
       // Ensure animation is cancelled on unmount
-      cancelAnimation(recordingPulse);
-    };
-  }, [isRecording, recordingPulse]);
+      cancelAnimation(recordingPulse)
+    }
+  }, [isRecording, recordingPulse])
 
   // Create animated style for the record button
   const animatedRecordButtonStyle = useAnimatedStyle(() => {
     return {
       transform: [{ scale: recordingPulse.value }],
-    };
-  });
+    }
+  })
 
   // Real-time waveform updates during recording
   useEffect(() => {
@@ -130,184 +122,172 @@ export function AudioRecorder({
       meteringInterval.current = setInterval(async () => {
         try {
           // Try to get metering data from recorder
-          const status = recorder.getStatus();
-          let level = 0.3; // Default fallback level
+          const status = recorder.getStatus()
+          let level = 0.3 // Default fallback level
 
-          if (status && typeof status.metering === 'number') {
+          if (status && typeof status.metering === "number") {
             // Convert dB to normalized value (typical range -160 to 0 dB)
-            const dbLevel = status.metering;
-            level = Math.max(0.1, Math.min(1.0, (dbLevel + 50) / 50));
+            const dbLevel = status.metering
+            level = Math.max(0.1, Math.min(1.0, (dbLevel + 50) / 50))
           } else {
             // Generate more realistic simulated audio levels
-            const time = Date.now() / 1000;
-            const baseLevel = 0.3 + Math.sin(time * 2) * 0.2; // Sine wave base
-            const variation = (Math.random() - 0.5) * 0.4; // Random variation
-            const spike = Math.random() < 0.1 ? Math.random() * 0.3 : 0; // Occasional spikes
-            level = Math.max(0.1, Math.min(0.9, baseLevel + variation + spike));
+            const time = Date.now() / 1000
+            const baseLevel = 0.3 + Math.sin(time * 2) * 0.2 // Sine wave base
+            const variation = (Math.random() - 0.5) * 0.4 // Random variation
+            const spike = Math.random() < 0.1 ? Math.random() * 0.3 : 0 // Occasional spikes
+            level = Math.max(0.1, Math.min(0.9, baseLevel + variation + spike))
           }
 
           // Update waveform data by shifting array and adding new value
           setWaveformData((prevData) => {
-            const newData = [...prevData.slice(1), level];
-            return newData;
-          });
+            const newData = [...prevData.slice(1), level]
+            return newData
+          })
         } catch (error) {
-          console.log('Using simulated audio data');
+          console.log("Using simulated audio data")
           // Fallback to realistic simulated data
-          const time = Date.now() / 1000;
-          const baseLevel = 0.4 + Math.sin(time * 3) * 0.2;
-          const noise = (Math.random() - 0.5) * 0.3;
-          const level = Math.max(0.15, Math.min(0.85, baseLevel + noise));
+          const time = Date.now() / 1000
+          const baseLevel = 0.4 + Math.sin(time * 3) * 0.2
+          const noise = (Math.random() - 0.5) * 0.3
+          const level = Math.max(0.15, Math.min(0.85, baseLevel + noise))
 
-          setWaveformData((prevData) => [...prevData.slice(1), level]);
+          setWaveformData((prevData) => [...prevData.slice(1), level])
         }
-      }, 80); // Update every 80ms for smooth animation
+      }, 80) // Update every 80ms for smooth animation
 
       return () => {
         if (meteringInterval.current) {
-          clearInterval(meteringInterval.current);
-          meteringInterval.current = null;
+          clearInterval(meteringInterval.current)
+          meteringInterval.current = null
         }
-      };
+      }
     } else {
       // Reset to quiet state when not recording
-      setWaveformData(Array.from({ length: 30 }, () => 0.2));
+      setWaveformData(Array.from({ length: 30 }, () => 0.2))
 
       if (meteringInterval.current) {
-        clearInterval(meteringInterval.current);
-        meteringInterval.current = null;
+        clearInterval(meteringInterval.current)
+        meteringInterval.current = null
       }
     }
-  }, [isRecording, recorder]);
+    return undefined
+  }, [isRecording, recorder])
 
   // Auto-stop recording when max duration is reached
   useEffect(() => {
     if (maxDuration && duration >= maxDuration && isRecording) {
-      handleStopRecording();
+      handleStopRecording()
     }
-  }, [duration, maxDuration, isRecording]);
+  }, [duration, maxDuration, isRecording])
 
   const startDurationTimer = () => {
-    setDuration(0);
+    setDuration(0)
     durationInterval.current = setInterval(() => {
-      setDuration((prev) => prev + 0.1);
-    }, 100);
-  };
+      setDuration((prev) => prev + 0.1)
+    }, 100)
+  }
 
   const stopDurationTimer = () => {
     if (durationInterval.current) {
-      clearInterval(durationInterval.current);
-      durationInterval.current = null;
+      clearInterval(durationInterval.current)
+      durationInterval.current = null
     }
-  };
+  }
 
   const handleStartRecording = async () => {
     if (!permissionGranted) {
-      Alert.alert(
-        'Permission Required',
-        'Microphone permission is required to record audio.'
-      );
-      return;
+      Alert.alert("Permission Required", "Microphone permission is required to record audio.")
+      return
     }
 
     try {
-      console.log('Starting recording...');
-      setRecordingUri(null);
-      setIsRecording(true);
-      startDurationTimer();
+      console.log("Starting recording...")
+      setRecordingUri(null)
+      setIsRecording(true)
+      startDurationTimer()
 
       // Enable metering in recording options
       const meteringOptions = {
         ...recordingOptions,
         isMeteringEnabled: true,
-      };
+      }
 
-      await recorder.prepareToRecordAsync(meteringOptions);
-      await recorder.record();
+      await recorder.prepareToRecordAsync(meteringOptions)
+      await recorder.record()
 
-      onRecordingStart?.();
-      console.log('Recording started successfully');
+      onRecordingStart?.()
+      console.log("Recording started successfully")
     } catch (error) {
-      console.error('Error starting recording:', error);
-      setIsRecording(false);
-      stopDurationTimer();
-      Alert.alert('Error', 'Failed to start recording. Please try again.');
+      console.error("Error starting recording:", error)
+      setIsRecording(false)
+      stopDurationTimer()
+      Alert.alert("Error", "Failed to start recording. Please try again.")
     }
-  };
+  }
 
   const handleStopRecording = async () => {
     try {
-      console.log('Stopping recording...');
-      setIsRecording(false);
-      stopDurationTimer();
+      console.log("Stopping recording...")
+      setIsRecording(false)
+      stopDurationTimer()
 
-      await recorder.stop();
-      const uri = recorder.uri;
-      console.log('Recording stopped, URI:', uri);
+      await recorder.stop()
+      const uri = recorder.uri
+      console.log("Recording stopped, URI:", uri)
 
       if (uri) {
-        setRecordingUri(uri);
-        onRecordingComplete?.(uri);
+        setRecordingUri(uri)
+        onRecordingComplete?.(uri)
       }
 
-      onRecordingStop?.();
+      onRecordingStop?.()
     } catch (error) {
-      console.error('Error stopping recording:', error);
-      Alert.alert('Error', 'Failed to stop recording. Please try again.');
+      console.error("Error stopping recording:", error)
+      Alert.alert("Error", "Failed to stop recording. Please try again.")
     }
-  };
+  }
 
   const handleDeleteRecording = () => {
-    Alert.alert(
-      'Delete Recording',
-      'Are you sure you want to delete this recording?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: () => {
-            setRecordingUri(null);
-            setDuration(0);
-          },
+    Alert.alert("Delete Recording", "Are you sure you want to delete this recording?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: () => {
+          setRecordingUri(null)
+          setDuration(0)
         },
-      ]
-    );
-  };
+      },
+    ])
+  }
 
   const handleSaveRecording = () => {
     if (recordingUri && onRecordingComplete) {
-      onRecordingComplete(recordingUri);
+      onRecordingComplete(recordingUri)
     }
-  };
+  }
 
   const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    const centisecs = Math.floor((seconds % 1) * 100);
-    return `${mins}:${secs.toString().padStart(2, '0')}.${centisecs
-      .toString()
-      .padStart(2, '0')}`;
-  };
+    const mins = Math.floor(seconds / 60)
+    const secs = Math.floor(seconds % 60)
+    const centisecs = Math.floor((seconds % 1) * 100)
+    return `${mins}:${secs.toString().padStart(2, "0")}.${centisecs.toString().padStart(2, "0")}`
+  }
 
   if (!permissionGranted) {
     return (
-      <View
-        style={[styles.container, { backgroundColor: secondaryColor }, style]}
-      >
-        <Text variant='body' style={{ color: textColor, textAlign: 'center' }}>
+      <View style={[styles.container, { backgroundColor: secondaryColor }, style]}>
+        <Text variant="body" style={{ color: textColor, textAlign: "center" }}>
           Microphone permission is required to record audio.
         </Text>
       </View>
-    );
+    )
   }
 
   return (
-    <View
-      style={[styles.container, { backgroundColor: secondaryColor }, style]}
-    >
+    <View style={[styles.container, { backgroundColor: secondaryColor }, style]}>
       {recordingUri && !isRecording ? (
-        <View style={{ alignItems: 'center' }}>
+        <View style={{ alignItems: "center" }}>
           <AudioPlayer
             source={{ uri: recordingUri }}
             showControls={true}
@@ -317,8 +297,8 @@ export function AudioRecorder({
           />
           <View style={styles.playbackControls}>
             <Button
-              variant='outline'
-              size='icon'
+              variant="outline"
+              size="icon"
               onPress={handleDeleteRecording}
               style={styles.controlButton}
             >
@@ -326,12 +306,12 @@ export function AudioRecorder({
             </Button>
 
             <Button
-              variant='default'
+              variant="default"
               onPress={handleSaveRecording}
               style={[styles.saveButton, { backgroundColor: greenColor }]}
             >
-              <Download size={20} color='white' />
-              <Text style={{ color: 'white', marginLeft: 8 }}>Save</Text>
+              <Download size={20} color="white" />
+              <Text style={{ color: "white", marginLeft: 8 }}>Save</Text>
             </Button>
           </View>
         </View>
@@ -342,10 +322,7 @@ export function AudioRecorder({
             <View style={styles.recordingStatus}>
               <View style={styles.recordingIndicator}>
                 <Circle size={8} color={redColor} fill={redColor} />
-                <Text
-                  variant='caption'
-                  style={{ color: redColor, marginLeft: 8 }}
-                >
+                <Text variant="caption" style={{ color: redColor, marginLeft: 8 }}>
                   Recording
                 </Text>
               </View>
@@ -374,16 +351,16 @@ export function AudioRecorder({
           {showTimer && (
             <View style={styles.timerContainer}>
               <Text
-                variant='title'
+                variant="title"
                 style={{
                   color: isRecording ? redColor : textColor,
-                  fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+                  fontFamily: "GeistMono-Regular",
                 }}
               >
                 {formatTime(duration)}
               </Text>
               {maxDuration && (
-                <Text variant='caption' style={{ color: mutedColor }}>
+                <Text variant="caption" style={{ color: mutedColor }}>
                   Max: {formatTime(maxDuration)}
                 </Text>
               )}
@@ -395,82 +372,82 @@ export function AudioRecorder({
             {!isRecording && !recordingUri && (
               <Animated.View style={animatedRecordButtonStyle}>
                 <Button
-                  variant='default'
-                  size='lg'
+                  variant="default"
+                  size="lg"
                   onPress={handleStartRecording}
                   style={[styles.recordButton, { backgroundColor: redColor }]}
                 >
-                  <Mic size={32} color='white' />
+                  <Mic size={32} color="white" />
                 </Button>
               </Animated.View>
             )}
 
             {isRecording && (
               <Button
-                variant='default'
-                size='lg'
+                variant="default"
+                size="lg"
                 onPress={handleStopRecording}
                 style={[styles.stopButton, { backgroundColor: redColor }]}
               >
-                <Square size={32} fill='white' color='white' />
+                <Square size={32} fill="white" color="white" />
               </Button>
             )}
           </View>
         </View>
       )}
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
   container: {
+    alignItems: "center",
     borderRadius: BORDER_RADIUS,
     padding: 20,
-    alignItems: 'center',
+  },
+  controlButton: {
+    height: 48,
+    width: 48,
+  },
+  controlsContainer: {
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  playbackControls: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 16,
+    marginTop: 16,
+  },
+  recordButton: {
+    borderRadius: 40,
+    height: 80,
+    width: 80,
+  },
+  recordingIndicator: {
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "center",
   },
   recordingStatus: {
     height: 36,
   },
-  recordingIndicator: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  waveformContainer: {
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  timerContainer: {
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  controlsContainer: {
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  recordButton: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-  },
-  stopButton: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-  },
-  playbackControls: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 16,
-    marginTop: 16,
-  },
-  controlButton: {
-    width: 48,
-    height: 48,
-  },
   saveButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: "center",
+    flexDirection: "row",
     paddingHorizontal: 24,
   },
-});
+  stopButton: {
+    borderRadius: 40,
+    height: 80,
+    width: 80,
+  },
+  timerContainer: {
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  waveformContainer: {
+    alignItems: "center",
+    marginBottom: 16,
+  },
+})

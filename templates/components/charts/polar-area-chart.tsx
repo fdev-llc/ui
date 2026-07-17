@@ -1,123 +1,115 @@
-import { Text } from '@/components/ui/text';
-import { useColor } from '@/hooks/useColor';
-import { useEffect, useState } from 'react';
-import { LayoutChangeEvent, View, ViewStyle } from 'react-native';
-import Animated, {
-  useAnimatedProps,
-  useSharedValue,
-  withTiming,
-} from 'react-native-reanimated';
-import Svg, { Circle, G, Path, Text as SvgText } from 'react-native-svg';
+import { useEffect, useState } from "react"
+import { LayoutChangeEvent, View, ViewStyle } from "react-native"
+import Animated, { useAnimatedProps, useSharedValue, withTiming } from "react-native-reanimated"
+import Svg, { Circle, G, Path, Text as SvgText } from "react-native-svg"
+
+import { Text } from "@/components/ui/text"
+import { useColor } from "@/hooks/useColor"
 
 // Animated SVG Components
-const AnimatedPath = Animated.createAnimatedComponent(Path);
+const AnimatedPath = Animated.createAnimatedComponent(Path)
 
 interface ChartConfig {
-  width?: number;
-  height?: number;
-  showLabels?: boolean;
-  animated?: boolean;
-  duration?: number;
+  width?: number
+  height?: number
+  showLabels?: boolean
+  animated?: boolean
+  duration?: number
 }
 
 interface ChartDataPoint {
-  label: string;
-  value: number;
-  color?: string;
+  label: string
+  value: number
+  color?: string
 }
 
 type Props = {
-  data: ChartDataPoint[];
-  config?: ChartConfig;
-  style?: ViewStyle;
-};
+  data: ChartDataPoint[]
+  config?: ChartConfig
+  style?: ViewStyle
+}
 
 export const PolarAreaChart = ({ data, config = {}, style }: Props) => {
-  const [containerWidth, setContainerWidth] = useState(300);
+  const [containerWidth, setContainerWidth] = useState(300)
 
-  const {
-    height = 200,
-    showLabels = true,
-    animated = true,
-    duration = 1000,
-  } = config;
+  const { height = 200, showLabels = true, animated = true, duration = 1000 } = config
 
-  const chartWidth = containerWidth || config.width || 300;
+  const chartWidth = containerWidth || config.width || 300
 
-  const primaryColor = useColor('primary');
-  const mutedColor = useColor('mutedForeground');
+  const primaryColor = useColor("primary")
+  const mutedColor = useColor("mutedForeground")
 
-  const animationProgress = useSharedValue(0);
+  const animationProgress = useSharedValue(0)
 
   const handleLayout = (event: LayoutChangeEvent) => {
-    const { width: measuredWidth } = event.nativeEvent.layout;
+    const { width: measuredWidth } = event.nativeEvent.layout
     if (measuredWidth > 0) {
-      setContainerWidth(measuredWidth);
+      setContainerWidth(measuredWidth)
     }
-  };
+  }
 
   useEffect(() => {
     if (animated) {
-      animationProgress.value = withTiming(1, { duration });
+      animationProgress.value = withTiming(1, { duration })
     } else {
-      animationProgress.value = 1;
+      animationProgress.value = 1
     }
-  }, [data, animated, duration]);
+  }, [data, animated, duration])
 
-  if (!data.length) return null;
+  if (!data.length) return null
 
-  const centerX = chartWidth / 2;
-  const centerY = height / 2;
-  const maxRadius = Math.min(chartWidth, height) / 2 - 20;
-  const maxValue = Math.max(...data.map((d) => d.value));
+  const centerX = chartWidth / 2
+  const centerY = height / 2
+  const maxRadius = Math.min(chartWidth, height) / 2 - 20
+  const maxValue = Math.max(...data.map((d) => d.value))
 
-  const angleStep = (2 * Math.PI) / data.length;
+  const angleStep = (2 * Math.PI) / data.length
 
   const colors = [
     primaryColor,
-    useColor('blue'),
-    useColor('green'),
-    useColor('orange'),
-    useColor('purple'),
-    useColor('pink'),
-  ];
+    useColor("blue"),
+    useColor("green"),
+    useColor("orange"),
+    useColor("purple"),
+    useColor("pink"),
+  ]
 
   return (
-    <View style={[{ width: '100%', height }, style]} onLayout={handleLayout}>
+    <View style={[{ width: "100%", height }, style]} onLayout={handleLayout}>
       <Svg width={chartWidth} height={height}>
         {data.map((item, index) => {
-          const angle = index * angleStep - Math.PI / 2;
-          const nextAngle = (index + 1) * angleStep - Math.PI / 2;
-          const radius = (item.value / maxValue) * maxRadius;
+          const angle = index * angleStep - Math.PI / 2
+          const nextAngle = (index + 1) * angleStep - Math.PI / 2
+          const radius = (item.value / maxValue) * maxRadius
 
-          const x1 = centerX + radius * Math.cos(angle);
-          const y1 = centerY + radius * Math.sin(angle);
-          const x2 = centerX + radius * Math.cos(nextAngle);
-          const y2 = centerY + radius * Math.sin(nextAngle);
+          const x1 = centerX + radius * Math.cos(angle)
+          const y1 = centerY + radius * Math.sin(angle)
+          const x2 = centerX + radius * Math.cos(nextAngle)
+          const y2 = centerY + radius * Math.sin(nextAngle)
 
           const pathData = [
             `M ${centerX} ${centerY}`,
             `L ${x1} ${y1}`,
             `A ${radius} ${radius} 0 0 1 ${x2} ${y2}`,
-            'Z',
-          ].join(' ');
+            "Z",
+          ].join(" ")
 
           // Label position
-          const labelAngle = angle + angleStep / 2;
-          const labelRadius = radius * 0.7;
-          const labelX = centerX + labelRadius * Math.cos(labelAngle);
-          const labelY = centerY + labelRadius * Math.sin(labelAngle);
+          const labelAngle = angle + angleStep / 2
+          const labelRadius = radius * 0.7
+          const labelX = centerX + labelRadius * Math.cos(labelAngle)
+          const labelY = centerY + labelRadius * Math.sin(labelAngle)
 
           const sliceAnimatedProps = useAnimatedProps(() => ({
             opacity: animationProgress.value * 0.8,
-          }));
+          }))
 
           return (
             <G key={`slice-${index}`}>
               <AnimatedPath
                 d={pathData}
                 fill={item.color || colors[index % colors.length]}
-                stroke='white'
+                stroke="white"
                 strokeWidth={1}
                 animatedProps={sliceAnimatedProps}
               />
@@ -126,17 +118,17 @@ export const PolarAreaChart = ({ data, config = {}, style }: Props) => {
                 <SvgText
                   x={labelX}
                   y={labelY}
-                  textAnchor='middle'
+                  textAnchor="middle"
                   fontSize={10}
-                  fill='#FFFFFF'
-                  fontWeight='600'
-                  alignmentBaseline='middle'
+                  fill="#FFFFFF"
+                  fontWeight="600"
+                  alignmentBaseline="middle"
                 >
                   {item.value}
                 </SvgText>
               )}
             </G>
-          );
+          )
         })}
 
         {/* Grid circles for reference */}
@@ -148,7 +140,7 @@ export const PolarAreaChart = ({ data, config = {}, style }: Props) => {
             r={maxRadius * ratio}
             stroke={mutedColor}
             strokeWidth={0.5}
-            fill='none'
+            fill="none"
             opacity={0.2}
           />
         ))}
@@ -160,8 +152,8 @@ export const PolarAreaChart = ({ data, config = {}, style }: Props) => {
           <View
             key={`legend-${index}`}
             style={{
-              flexDirection: 'row',
-              alignItems: 'center',
+              flexDirection: "row",
+              alignItems: "center",
               marginBottom: 5,
             }}
           >
@@ -174,12 +166,12 @@ export const PolarAreaChart = ({ data, config = {}, style }: Props) => {
                 marginRight: 8,
               }}
             />
-            <Text variant='caption'>
+            <Text variant="caption">
               {item.label}: {item.value}
             </Text>
           </View>
         ))}
       </View>
     </View>
-  );
-};
+  )
+}

@@ -1,33 +1,34 @@
-import { Text } from '@/components/ui/text';
-import { useColor } from '@/hooks/useColor';
-import { BORDER_RADIUS, CORNERS, FONT_SIZE } from '@/theme/globals';
-import React from 'react';
-import { TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native';
+import React from "react"
+import { TextStyle, TouchableOpacity, View, ViewStyle } from "react-native"
+
+import { Text } from "@/components/ui/text"
+import { useColor } from "@/hooks/useColor"
+import { BORDER_RADIUS, CORNERS, FONT_SIZE } from "@/theme/globals"
 
 export interface RadioOption {
-  label: string;
-  value: string;
-  disabled?: boolean;
+  label: string
+  value: string
+  disabled?: boolean
 }
 
 interface RadioGroupProps {
-  options: RadioOption[];
-  value?: string;
-  onValueChange?: (value: string) => void;
-  disabled?: boolean;
-  orientation?: 'vertical' | 'horizontal';
-  style?: ViewStyle;
-  optionStyle?: ViewStyle;
-  labelStyle?: TextStyle;
+  options: RadioOption[]
+  value?: string
+  onValueChange?: (value: string) => void
+  disabled?: boolean
+  orientation?: "vertical" | "horizontal"
+  style?: ViewStyle
+  optionStyle?: ViewStyle
+  labelStyle?: TextStyle
 }
 
 interface RadioButtonProps {
-  option: RadioOption;
-  selected: boolean;
-  onPress: () => void;
-  disabled?: boolean;
-  style?: ViewStyle;
-  labelStyle?: TextStyle;
+  option: RadioOption
+  selected: boolean
+  onPress: () => void
+  disabled?: boolean
+  style?: ViewStyle
+  labelStyle?: TextStyle
 }
 
 export function RadioButton({
@@ -38,12 +39,12 @@ export function RadioButton({
   style,
   labelStyle,
 }: RadioButtonProps) {
-  const primaryColor = useColor('primary');
-  const borderColor = useColor('border');
-  const textColor = useColor('text');
-  const mutedColor = useColor('textMuted');
+  const primaryColor = useColor("primary")
+  const borderColor = useColor("border")
+  const textColor = useColor("text")
+  const mutedColor = useColor("textMuted")
 
-  const isDisabled = disabled || option.disabled;
+  const isDisabled = disabled || option.disabled
 
   const radioButtonStyle: ViewStyle = {
     width: BORDER_RADIUS,
@@ -51,33 +52,33 @@ export function RadioButton({
     borderRadius: CORNERS,
     borderWidth: 1.5,
     borderColor: selected ? primaryColor : borderColor,
-    backgroundColor: 'transparent',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "transparent",
+    alignItems: "center",
+    justifyContent: "center",
     marginRight: 12,
-  };
+  }
 
   const innerCircleStyle: ViewStyle = {
     width: 16,
     height: 16,
     borderRadius: CORNERS,
-    backgroundColor: selected ? primaryColor : 'transparent',
-  };
+    backgroundColor: selected ? primaryColor : "transparent",
+  }
 
   const containerStyle: ViewStyle = {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingVertical: 4,
     paddingHorizontal: 4,
     opacity: isDisabled ? 0.5 : 1,
-  };
+  }
 
   const textStyle: TextStyle = {
     color: isDisabled ? mutedColor : textColor,
     fontSize: FONT_SIZE,
-    fontWeight: '400',
+    fontWeight: "400",
     lineHeight: 24,
-  };
+  }
 
   return (
     <TouchableOpacity
@@ -91,7 +92,7 @@ export function RadioButton({
       </View>
       <Text style={[textStyle, labelStyle]}>{option.label}</Text>
     </TouchableOpacity>
-  );
+  )
 }
 
 export function RadioGroup({
@@ -99,21 +100,21 @@ export function RadioGroup({
   value,
   onValueChange,
   disabled = false,
-  orientation = 'vertical',
+  orientation = "vertical",
   style,
   optionStyle,
   labelStyle,
 }: RadioGroupProps) {
   const containerStyle: ViewStyle = {
-    flexDirection: orientation === 'horizontal' ? 'row' : 'column',
-    gap: orientation === 'horizontal' ? 16 : 4,
-  };
+    flexDirection: orientation === "horizontal" ? "row" : "column",
+    gap: orientation === "horizontal" ? 16 : 4,
+  }
 
   const handlePress = (optionValue: string) => {
     if (onValueChange && !disabled) {
-      onValueChange(optionValue);
+      onValueChange(optionValue)
     }
-  };
+  }
 
   return (
     <View style={[containerStyle, style]}>
@@ -129,5 +130,5 @@ export function RadioGroup({
         />
       ))}
     </View>
-  );
+  )
 }

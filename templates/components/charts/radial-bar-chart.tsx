@@ -1,98 +1,84 @@
-import { Text } from '@/components/ui/text';
-import { useColor } from '@/hooks/useColor';
-import { useEffect, useState } from 'react';
-import { LayoutChangeEvent, View, ViewStyle } from 'react-native';
-import Animated, {
-  useAnimatedProps,
-  useSharedValue,
-  withTiming,
-} from 'react-native-reanimated';
-import Svg, {
-  Circle,
-  Defs,
-  LinearGradient,
-  Stop,
-  Text as SvgText,
-} from 'react-native-svg';
+import { useEffect, useState } from "react"
+import { LayoutChangeEvent, View, ViewStyle } from "react-native"
+import Animated, { useAnimatedProps, useSharedValue, withTiming } from "react-native-reanimated"
+import Svg, { Circle, Defs, LinearGradient, Stop, Text as SvgText } from "react-native-svg"
+
+import { Text } from "@/components/ui/text"
+import { useColor } from "@/hooks/useColor"
 
 // Animated SVG Components
-const AnimatedCircle = Animated.createAnimatedComponent(Circle);
+const AnimatedCircle = Animated.createAnimatedComponent(Circle)
 
 interface ChartConfig {
-  padding?: number;
-  animated?: boolean;
-  duration?: number;
-  gradient?: boolean;
+  padding?: number
+  animated?: boolean
+  duration?: number
+  gradient?: boolean
 }
 
 interface ChartDataPoint {
-  label: string;
-  value: number;
-  color?: string;
+  label: string
+  value: number
+  color?: string
 }
 
 type Props = {
-  data: ChartDataPoint[];
-  config?: ChartConfig;
-  style?: ViewStyle;
-};
+  data: ChartDataPoint[]
+  config?: ChartConfig
+  style?: ViewStyle
+}
 
 export const RadialBarChart = ({ data, config = {}, style }: Props) => {
-  const [containerSize, setContainerSize] = useState(200);
+  const [containerSize, setContainerSize] = useState(200)
 
-  const {
-    padding = 20,
-    animated = true,
-    duration = 1000,
-    gradient = false,
-  } = config;
+  const { padding = 20, animated = true, duration = 1000, gradient = false } = config
 
-  const primaryColor = useColor('primary');
-  const mutedColor = useColor('mutedForeground');
+  const primaryColor = useColor("primary")
+  const mutedColor = useColor("mutedForeground")
 
-  const animationProgress = useSharedValue(0);
+  const animationProgress = useSharedValue(0)
 
   const handleLayout = (event: LayoutChangeEvent) => {
-    const { width, height } = event.nativeEvent.layout;
-    const size = Math.min(width, height);
+    const { width, height } = event.nativeEvent.layout
+    const size = Math.min(width, height)
     if (size > 0) {
-      setContainerSize(size);
+      setContainerSize(size)
     }
-  };
+  }
 
   useEffect(() => {
     if (animated) {
-      animationProgress.value = withTiming(1, { duration });
+      animationProgress.value = withTiming(1, { duration })
     } else {
-      animationProgress.value = 1;
+      animationProgress.value = 1
     }
-  }, [data, animated, duration]);
+  }, [data, animated, duration])
 
-  if (!data.length) return null;
+  if (!data.length) return null
 
-  const maxValue = Math.max(...data.map((d) => d.value));
-  const size = containerSize || 200;
-  const center = size / 2;
-  const maxRadius = (size - padding * 2) / 2;
-  const strokeWidth = maxRadius / (data.length + 1);
+  const maxValue = Math.max(...data.map((d) => d.value))
+  const size = containerSize || 200
+  const center = size / 2
+  const maxRadius = (size - padding * 2) / 2
+  const strokeWidth = maxRadius / (data.length + 1)
 
   const colors = [
     primaryColor,
-    useColor('blue'),
-    useColor('green'),
-    useColor('orange'),
-    useColor('purple'),
-    useColor('pink'),
-  ];
+    useColor("blue"),
+    useColor("green"),
+    useColor("orange"),
+    useColor("purple"),
+    useColor("pink"),
+  ]
 
   return (
-    <View style={[{ width: '100%' }, style]}>
+    <View style={[{ width: "100%" }, style]}>
       <View
         style={{
-          width: '100%',
+          width: "100%",
           height: size,
-          alignItems: 'center',
-          justifyContent: 'center',
+          alignItems: "center",
+          justifyContent: "center",
         }}
         onLayout={handleLayout}
       >
@@ -103,39 +89,38 @@ export const RadialBarChart = ({ data, config = {}, style }: Props) => {
                 <LinearGradient
                   key={`gradient-${index}`}
                   id={`radialGradient-${index}`}
-                  x1='0%'
-                  y1='0%'
-                  x2='100%'
-                  y2='0%'
+                  x1="0%"
+                  y1="0%"
+                  x2="100%"
+                  y2="0%"
                 >
                   <Stop
-                    offset='0%'
+                    offset="0%"
                     stopColor={item.color || colors[index % colors.length]}
-                    stopOpacity='0.3'
+                    stopOpacity="0.3"
                   />
                   <Stop
-                    offset='100%'
+                    offset="100%"
                     stopColor={item.color || colors[index % colors.length]}
-                    stopOpacity='1'
+                    stopOpacity="1"
                   />
                 </LinearGradient>
               ))}
           </Defs>
 
           {data.map((item, index) => {
-            const radius = maxRadius - index * strokeWidth - strokeWidth / 2;
-            const circumference = 2 * Math.PI * radius;
-            const progressRatio = item.value / maxValue;
+            const radius = maxRadius - index * strokeWidth - strokeWidth / 2
+            const circumference = 2 * Math.PI * radius
+            const progressRatio = item.value / maxValue
 
             const circleAnimatedProps = useAnimatedProps(() => {
-              const animatedProgress = animationProgress.value * progressRatio;
-              const strokeDashoffset =
-                circumference - animatedProgress * circumference;
+              const animatedProgress = animationProgress.value * progressRatio
+              const strokeDashoffset = circumference - animatedProgress * circumference
 
               return {
                 strokeDashoffset,
-              };
-            });
+              }
+            })
 
             return (
               <AnimatedCircle
@@ -149,13 +134,13 @@ export const RadialBarChart = ({ data, config = {}, style }: Props) => {
                     : item.color || colors[index % colors.length]
                 }
                 strokeWidth={strokeWidth * 0.8}
-                fill='none'
-                strokeLinecap='round'
+                fill="none"
+                strokeLinecap="round"
                 strokeDasharray={circumference}
                 transform={`rotate(-90 ${center} ${center})`}
                 animatedProps={circleAnimatedProps}
               />
-            );
+            )
           })}
 
           {/* Center values */}
@@ -164,17 +149,17 @@ export const RadialBarChart = ({ data, config = {}, style }: Props) => {
               <SvgText
                 x={center}
                 y={center - 5}
-                textAnchor='middle'
+                textAnchor="middle"
                 fontSize={16}
                 fill={primaryColor}
-                fontWeight='bold'
+                fontWeight="bold"
               >
                 {data.reduce((sum, item) => sum + item.value, 0)}
               </SvgText>
               <SvgText
                 x={center}
                 y={center + 15}
-                textAnchor='middle'
+                textAnchor="middle"
                 fontSize={12}
                 fill={mutedColor}
               >
@@ -191,8 +176,8 @@ export const RadialBarChart = ({ data, config = {}, style }: Props) => {
           <View
             key={`legend-${index}`}
             style={{
-              flexDirection: 'row',
-              alignItems: 'center',
+              flexDirection: "row",
+              alignItems: "center",
               marginBottom: 8,
             }}
           >
@@ -205,12 +190,12 @@ export const RadialBarChart = ({ data, config = {}, style }: Props) => {
                 marginRight: 10,
               }}
             />
-            <Text variant='caption'>
+            <Text variant="caption">
               {item.label}: {item.value}
             </Text>
           </View>
         ))}
       </View>
     </View>
-  );
-};
+  )
+}

@@ -1,10 +1,4 @@
-import { Icon } from '@/components/ui/icon';
-import { Text } from '@/components/ui/text';
-import { View } from '@/components/ui/view';
-import { useColor } from '@/hooks/useColor';
-import { CORNERS, FONT_SIZE, HEIGHT } from '@/theme/globals';
-import { Search, X } from 'lucide-react-native';
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from "react"
 import {
   ActivityIndicator,
   TextInput,
@@ -12,18 +6,26 @@ import {
   TextStyle,
   TouchableOpacity,
   ViewStyle,
-} from 'react-native';
+} from "react-native"
+import { Search, X } from "lucide-react-native"
 
-interface SearchBarProps extends Omit<TextInputProps, 'style'> {
-  loading?: boolean;
-  onSearch?: (query: string) => void;
-  onClear?: () => void;
-  showClearButton?: boolean;
-  leftIcon?: React.ReactNode;
-  rightIcon?: React.ReactNode;
-  containerStyle?: ViewStyle | ViewStyle[];
-  inputStyle?: TextStyle | TextStyle[];
-  debounceMs?: number;
+import { Icon } from "@/components/ui/icon"
+import { Text } from "@/components/ui/text"
+import { View } from "@/components/ui/view"
+import { useColor } from "@/hooks/useColor"
+import { CORNERS, FONT_SIZE, HEIGHT } from "@/theme/globals"
+import { withGeistFont } from "@/theme/typography"
+
+interface SearchBarProps extends Omit<TextInputProps, "style"> {
+  loading?: boolean
+  onSearch?: (query: string) => void
+  onClear?: () => void
+  showClearButton?: boolean
+  leftIcon?: React.ReactNode
+  rightIcon?: React.ReactNode
+  containerStyle?: ViewStyle | ViewStyle[]
+  inputStyle?: TextStyle | TextStyle[]
+  debounceMs?: number
 }
 
 export function SearchBar({
@@ -36,71 +38,71 @@ export function SearchBar({
   containerStyle,
   inputStyle,
   debounceMs = 300,
-  placeholder = 'Search...',
+  placeholder = "Search...",
   value,
   onChangeText,
   ...props
 }: SearchBarProps) {
-  const [internalValue, setInternalValue] = useState(value || '');
-  const debounceRef = useRef<NodeJS.Timeout | null>(null);
-  const inputRef = useRef<TextInput>(null);
+  const [internalValue, setInternalValue] = useState(value || "")
+  const debounceRef = useRef<NodeJS.Timeout | null>(null)
+  const inputRef = useRef<TextInput>(null)
 
   // Theme colors
-  const cardColor = useColor('card');
-  const textColor = useColor('text');
-  const muted = useColor('textMuted');
-  const icon = useColor('icon');
+  const cardColor = useColor("card")
+  const textColor = useColor("text")
+  const muted = useColor("textMuted")
+  const icon = useColor("icon")
 
   // Handle text change with debouncing
   const handleTextChange = useCallback(
     (text: string) => {
-      setInternalValue(text);
-      onChangeText?.(text);
+      setInternalValue(text)
+      onChangeText?.(text)
 
       if (onSearch && debounceMs > 0) {
         if (debounceRef.current) {
-          clearTimeout(debounceRef.current);
+          clearTimeout(debounceRef.current)
         }
-        (debounceRef.current as any) = setTimeout(() => {
-          onSearch(text);
-        }, debounceMs);
+        ;(debounceRef.current as any) = setTimeout(() => {
+          onSearch(text)
+        }, debounceMs)
       } else if (onSearch) {
-        onSearch(text);
+        onSearch(text)
       }
     },
-    [onChangeText, onSearch, debounceMs]
-  );
+    [onChangeText, onSearch, debounceMs],
+  )
 
   // Handle clear button press
   const handleClear = useCallback(() => {
-    setInternalValue('');
-    onChangeText?.('');
-    onClear?.();
-    onSearch?.('');
+    setInternalValue("")
+    onChangeText?.("")
+    onClear?.()
+    onSearch?.("")
     if (debounceRef.current) {
-      clearTimeout(debounceRef.current);
+      clearTimeout(debounceRef.current)
     }
-  }, [onChangeText, onClear, onSearch]);
+  }, [onChangeText, onClear, onSearch])
 
   // Get container style based on variant and size
   const baseStyle: ViewStyle = {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: cardColor,
     height: HEIGHT,
     paddingHorizontal: 16,
     borderRadius: CORNERS,
-  };
+  }
 
   const baseInputStyle = {
     flex: 1,
     fontSize: FONT_SIZE,
     color: textColor,
     marginHorizontal: 8,
-  };
+  }
 
-  const displayValue = value !== undefined ? value : internalValue;
-  const showClear = showClearButton && displayValue.length > 0;
+  const displayValue = value !== undefined ? value : internalValue
+  const showClear = showClearButton && displayValue.length > 0
 
   return (
     <View style={[baseStyle, containerStyle]}>
@@ -110,7 +112,7 @@ export function SearchBar({
       {/* Text Input */}
       <TextInput
         ref={inputRef}
-        style={[baseInputStyle, inputStyle]}
+        style={withGeistFont([baseInputStyle, inputStyle])}
         placeholder={placeholder}
         placeholderTextColor={muted}
         value={displayValue}
@@ -119,13 +121,7 @@ export function SearchBar({
       />
 
       {/* Loading Indicator */}
-      {loading && (
-        <ActivityIndicator
-          size='small'
-          color={muted}
-          style={{ marginRight: 4 }}
-        />
-      )}
+      {loading && <ActivityIndicator size="small" color={muted} style={{ marginRight: 4 }} />}
 
       {/* Clear Button */}
       {showClear && !loading && (
@@ -146,15 +142,15 @@ export function SearchBar({
       {/* Right Icon */}
       {rightIcon && !showClear && !loading && rightIcon}
     </View>
-  );
+  )
 }
 
 // SearchBar with suggestions dropdown
 interface SearchBarWithSuggestionsProps extends SearchBarProps {
-  suggestions?: string[];
-  onSuggestionPress?: (suggestion: string) => void;
-  maxSuggestions?: number;
-  showSuggestions?: boolean;
+  suggestions?: string[]
+  onSuggestionPress?: (suggestion: string) => void
+  maxSuggestions?: number
+  showSuggestions?: boolean
 }
 
 export function SearchBarWithSuggestions({
@@ -165,41 +161,39 @@ export function SearchBarWithSuggestions({
   containerStyle,
   ...searchBarProps
 }: SearchBarWithSuggestionsProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const cardColor = useColor('card');
-  const borderColor = useColor('border');
+  const [isExpanded, setIsExpanded] = useState(false)
+  const cardColor = useColor("card")
+  const borderColor = useColor("border")
 
   const filteredSuggestions = suggestions
     .filter((suggestion) =>
-      suggestion
-        .toLowerCase()
-        .includes((searchBarProps.value || '').toLowerCase())
+      suggestion.toLowerCase().includes((searchBarProps.value || "").toLowerCase()),
     )
-    .slice(0, maxSuggestions);
+    .slice(0, maxSuggestions)
 
   const shouldShowSuggestions =
     showSuggestions &&
     isExpanded &&
     filteredSuggestions.length > 0 &&
-    (searchBarProps.value || '').length > 0;
+    (searchBarProps.value || "").length > 0
 
   const handleSuggestionPress = (suggestion: string) => {
-    onSuggestionPress?.(suggestion);
-    setIsExpanded(false);
-  };
+    onSuggestionPress?.(suggestion)
+    setIsExpanded(false)
+  }
 
   return (
-    <View style={[{ width: '100%' }, containerStyle]}>
+    <View style={[{ width: "100%" }, containerStyle]}>
       <SearchBar
         {...searchBarProps}
         onFocus={(e) => {
-          setIsExpanded(true);
-          searchBarProps.onFocus?.(e);
+          setIsExpanded(true)
+          searchBarProps.onFocus?.(e)
         }}
         onBlur={(e) => {
           // Delay hiding suggestions to allow for suggestion tap
-          setTimeout(() => setIsExpanded(false), 150);
-          searchBarProps.onBlur?.(e);
+          setTimeout(() => setIsExpanded(false), 150)
+          searchBarProps.onBlur?.(e)
         }}
       />
 
@@ -207,8 +201,8 @@ export function SearchBarWithSuggestions({
       {shouldShowSuggestions && (
         <View
           style={{
-            position: 'absolute',
-            top: '100%',
+            position: "absolute",
+            top: "100%",
             left: 0,
             right: 0,
             backgroundColor: cardColor,
@@ -225,8 +219,7 @@ export function SearchBarWithSuggestions({
               style={{
                 paddingHorizontal: 16,
                 paddingVertical: 12,
-                borderBottomWidth:
-                  index < filteredSuggestions.length - 1 ? 0.6 : 0,
+                borderBottomWidth: index < filteredSuggestions.length - 1 ? 0.6 : 0,
                 borderBottomColor: borderColor,
               }}
               activeOpacity={0.7}
@@ -237,5 +230,5 @@ export function SearchBarWithSuggestions({
         </View>
       )}
     </View>
-  );
+  )
 }

@@ -1,8 +1,5 @@
-import { Button } from '@/components/ui/button';
-import { Text } from '@/components/ui/text';
-import { View } from '@/components/ui/view';
-import { useColor } from '@/hooks/useColor';
-import { BORDER_RADIUS, FONT_SIZE, HEIGHT } from '@/theme/globals';
+import React, { useMemo, useState } from "react"
+import { ScrollView, TextInput, TextStyle, TouchableOpacity, ViewStyle } from "react-native"
 import {
   ChevronDown,
   ChevronLeft,
@@ -11,53 +8,52 @@ import {
   ChevronsRight,
   ChevronUp,
   Search,
-} from 'lucide-react-native';
-import React, { useMemo, useState } from 'react';
-import {
-  ScrollView,
-  TextInput,
-  TextStyle,
-  TouchableOpacity,
-  ViewStyle,
-} from 'react-native';
+} from "lucide-react-native"
+
+import { Button } from "@/components/ui/button"
+import { Text } from "@/components/ui/text"
+import { View } from "@/components/ui/view"
+import { useColor } from "@/hooks/useColor"
+import { BORDER_RADIUS, FONT_SIZE, HEIGHT } from "@/theme/globals"
+import { withGeistFont } from "@/theme/typography"
 
 // Types
 export interface TableColumn<T = any> {
-  id: string;
-  header: string;
-  accessorKey: string;
-  sortable?: boolean;
-  filterable?: boolean;
-  width?: number | string;
-  minWidth?: number;
-  cell?: (value: any, row: T) => React.ReactNode;
-  headerCell?: () => React.ReactNode;
-  align?: 'left' | 'center' | 'right';
+  id: string
+  header: string
+  accessorKey: string
+  sortable?: boolean
+  filterable?: boolean
+  width?: number | string
+  minWidth?: number
+  cell?: (value: any, row: T) => React.ReactNode
+  headerCell?: () => React.ReactNode
+  align?: "left" | "center" | "right"
 }
 
 export interface TableProps<T = any> {
-  data: T[];
-  columns: TableColumn<T>[];
-  pagination?: boolean;
-  pageSize?: number;
-  searchable?: boolean;
-  searchPlaceholder?: string;
-  loading?: boolean;
-  emptyMessage?: string;
-  style?: ViewStyle;
-  headerStyle?: ViewStyle;
-  rowStyle?: ViewStyle;
-  cellStyle?: ViewStyle;
-  onRowPress?: (row: T, index: number) => void;
-  sortable?: boolean;
-  filterable?: boolean;
+  data: T[]
+  columns: TableColumn<T>[]
+  pagination?: boolean
+  pageSize?: number
+  searchable?: boolean
+  searchPlaceholder?: string
+  loading?: boolean
+  emptyMessage?: string
+  style?: ViewStyle
+  headerStyle?: ViewStyle
+  rowStyle?: ViewStyle
+  cellStyle?: ViewStyle
+  onRowPress?: (row: T, index: number) => void
+  sortable?: boolean
+  filterable?: boolean
 }
 
-type SortDirection = 'asc' | 'desc' | null;
+type SortDirection = "asc" | "desc" | null
 
 interface SortState {
-  column: string | null;
-  direction: SortDirection;
+  column: string | null
+  direction: SortDirection
 }
 
 export function Table<T = any>({
@@ -66,9 +62,9 @@ export function Table<T = any>({
   pagination = true,
   pageSize = 10,
   searchable = true,
-  searchPlaceholder = 'Search...',
+  searchPlaceholder = "Search...",
   loading = false,
-  emptyMessage = 'No data available',
+  emptyMessage = "No data available",
   style,
   headerStyle,
   rowStyle,
@@ -78,129 +74,117 @@ export function Table<T = any>({
   filterable = true,
 }: TableProps<T>) {
   // Theme colors
-  const borderColor = useColor('border');
-  const textColor = useColor('text');
-  const mutedColor = useColor('textMuted');
-  const cardColor = useColor('card');
-  const primaryColor = useColor('primary');
+  const borderColor = useColor("border")
+  const textColor = useColor("text")
+  const mutedColor = useColor("textMuted")
+  const cardColor = useColor("card")
+  const primaryColor = useColor("primary")
 
   // State
-  const [currentPage, setCurrentPage] = useState(1);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1)
+  const [searchQuery, setSearchQuery] = useState("")
   const [sortState, setSortState] = useState<SortState>({
     column: null,
     direction: null,
-  });
+  })
 
   // Filter and sort data
   const filteredAndSortedData = useMemo(() => {
-    let processedData = [...data];
+    let processedData = [...data]
 
     // Apply search filter
     if (searchQuery && filterable) {
       processedData = processedData.filter((row) =>
         columns.some((column) => {
-          if (!column.filterable) return false;
-          const value = (row as any)[column.accessorKey];
-          return String(value || '')
+          if (!column.filterable) return false
+          const value = (row as any)[column.accessorKey]
+          return String(value || "")
             .toLowerCase()
-            .includes(searchQuery.toLowerCase());
-        })
-      );
+            .includes(searchQuery.toLowerCase())
+        }),
+      )
     }
 
     // Apply sorting
     if (sortState.column && sortState.direction && sortable) {
       processedData.sort((a, b) => {
-        const aValue = (a as any)[sortState.column!];
-        const bValue = (b as any)[sortState.column!];
+        const aValue = (a as any)[sortState.column!]
+        const bValue = (b as any)[sortState.column!]
 
-        if (aValue === null || aValue === undefined) return 1;
-        if (bValue === null || bValue === undefined) return -1;
+        if (aValue === null || aValue === undefined) return 1
+        if (bValue === null || bValue === undefined) return -1
 
-        if (typeof aValue === 'string' && typeof bValue === 'string') {
-          const comparison = aValue.localeCompare(bValue);
-          return sortState.direction === 'asc' ? comparison : -comparison;
+        if (typeof aValue === "string" && typeof bValue === "string") {
+          const comparison = aValue.localeCompare(bValue)
+          return sortState.direction === "asc" ? comparison : -comparison
         }
 
-        if (aValue < bValue) return sortState.direction === 'asc' ? -1 : 1;
-        if (aValue > bValue) return sortState.direction === 'asc' ? 1 : -1;
-        return 0;
-      });
+        if (aValue < bValue) return sortState.direction === "asc" ? -1 : 1
+        if (aValue > bValue) return sortState.direction === "asc" ? 1 : -1
+        return 0
+      })
     }
 
-    return processedData;
-  }, [data, searchQuery, sortState, columns, filterable, sortable]);
+    return processedData
+  }, [data, searchQuery, sortState, columns, filterable, sortable])
 
   // Pagination
-  const totalPages = pagination
-    ? Math.ceil(filteredAndSortedData.length / pageSize)
-    : 1;
-  const startIndex = pagination ? (currentPage - 1) * pageSize : 0;
-  const endIndex = pagination
-    ? startIndex + pageSize
-    : filteredAndSortedData.length;
-  const paginatedData = filteredAndSortedData.slice(startIndex, endIndex);
+  const totalPages = pagination ? Math.ceil(filteredAndSortedData.length / pageSize) : 1
+  const startIndex = pagination ? (currentPage - 1) * pageSize : 0
+  const endIndex = pagination ? startIndex + pageSize : filteredAndSortedData.length
+  const paginatedData = filteredAndSortedData.slice(startIndex, endIndex)
 
   // Handlers
   const handleSort = (columnId: string) => {
-    if (!sortable) return;
+    if (!sortable) return
 
-    const column = columns.find((col) => col.id === columnId);
-    if (!column?.sortable) return;
+    const column = columns.find((col) => col.id === columnId)
+    if (!column?.sortable) return
 
     setSortState((prev) => {
       if (prev.column === columnId) {
         // Cycle through: asc -> desc -> null
         const newDirection: SortDirection =
-          prev.direction === 'asc'
-            ? 'desc'
-            : prev.direction === 'desc'
-            ? null
-            : 'asc';
+          prev.direction === "asc" ? "desc" : prev.direction === "desc" ? null : "asc"
 
         return {
           column: newDirection ? columnId : null,
           direction: newDirection,
-        };
+        }
       } else {
-        return { column: columnId, direction: 'asc' };
+        return { column: columnId, direction: "asc" }
       }
-    });
-  };
+    })
+  }
 
   const handlePageChange = (page: number) => {
-    setCurrentPage(Math.max(1, Math.min(page, totalPages)));
-  };
+    setCurrentPage(Math.max(1, Math.min(page, totalPages)))
+  }
 
   const renderSortIcon = (columnId: string) => {
-    if (!sortable) return null;
+    if (!sortable) return null
 
-    const column = columns.find((col) => col.id === columnId);
-    if (!column?.sortable) return null;
+    const column = columns.find((col) => col.id === columnId)
+    if (!column?.sortable) return null
 
     if (sortState.column !== columnId) {
-      return (
-        <ChevronUp size={16} color={mutedColor} style={{ opacity: 0.3 }} />
-      );
+      return <ChevronUp size={16} color={mutedColor} style={{ opacity: 0.3 }} />
     }
 
-    return sortState.direction === 'asc' ? (
+    return sortState.direction === "asc" ? (
       <ChevronUp size={16} color={primaryColor} />
     ) : (
       <ChevronDown size={16} color={primaryColor} />
-    );
-  };
+    )
+  }
 
   const renderCell = (column: TableColumn<T>, row: T, rowIndex: number) => {
-    const value = (row as any)[column.accessorKey];
-    const cellContent = column.cell
-      ? column.cell(value, row)
-      : String(value || '');
+    const value = (row as any)[column.accessorKey]
+    const cellContent = column.cell ? column.cell(value, row) : String(value || "")
 
     const alignStyle: TextStyle = {
-      textAlign: column.align || 'left',
-    };
+      textAlign: column.align || "left",
+    }
 
     return (
       <View
@@ -212,27 +196,25 @@ export function Table<T = any>({
             minWidth: column.minWidth || 100,
             paddingHorizontal: 18,
             paddingVertical: 16,
-            justifyContent: 'center',
+            justifyContent: "center",
           },
           cellStyle,
         ]}
       >
-        {typeof cellContent === 'string' ? (
-          <Text style={[{ fontSize: FONT_SIZE }, alignStyle]}>
-            {cellContent}
-          </Text>
+        {typeof cellContent === "string" ? (
+          <Text style={[{ fontSize: FONT_SIZE }, alignStyle]}>{cellContent}</Text>
         ) : (
           cellContent
         )}
       </View>
-    );
-  };
+    )
+  }
 
   const renderHeader = () => (
     <View
       style={[
         {
-          flexDirection: 'row',
+          flexDirection: "row",
           backgroundColor: cardColor,
           borderBottomWidth: 1,
           borderBottomColor: borderColor,
@@ -249,14 +231,14 @@ export function Table<T = any>({
             minWidth: column.minWidth || 100,
             paddingHorizontal: 18,
             paddingVertical: 16,
-            flexDirection: 'row',
-            alignItems: 'center',
+            flexDirection: "row",
+            alignItems: "center",
             justifyContent:
-              column.align === 'center'
-                ? 'center'
-                : column.align === 'right'
-                ? 'flex-end'
-                : 'flex-start',
+              column.align === "center"
+                ? "center"
+                : column.align === "right"
+                  ? "flex-end"
+                  : "flex-start",
           }}
           onPress={() => handleSort(column.id)}
           disabled={!column.sortable || !sortable}
@@ -266,10 +248,10 @@ export function Table<T = any>({
           ) : (
             <>
               <Text
-                variant='subtitle'
+                variant="subtitle"
                 style={{
                   marginRight: column.sortable && sortable ? 4 : 0,
-                  textAlign: column.align || 'left',
+                  textAlign: column.align || "left",
                 }}
               >
                 {column.header}
@@ -280,14 +262,14 @@ export function Table<T = any>({
         </TouchableOpacity>
       ))}
     </View>
-  );
+  )
 
   const renderRow = (row: T, index: number) => (
     <TouchableOpacity
       key={index}
       style={[
         {
-          flexDirection: 'row',
+          flexDirection: "row",
           backgroundColor: cardColor,
           borderBottomWidth: 1,
           borderBottomColor: borderColor,
@@ -300,17 +282,17 @@ export function Table<T = any>({
     >
       {columns.map((column) => renderCell(column, row, index))}
     </TouchableOpacity>
-  );
+  )
 
   const renderPagination = () => {
-    if (!pagination || totalPages <= 1) return null;
+    if (!pagination || totalPages <= 1) return null
 
     return (
       <View
         style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
           paddingHorizontal: 16,
           paddingVertical: 18,
           backgroundColor: cardColor,
@@ -318,72 +300,59 @@ export function Table<T = any>({
           borderTopColor: borderColor,
         }}
       >
-        <Text variant='caption'>
-          Page {currentPage} of {totalPages} ({filteredAndSortedData.length}{' '}
-          total)
+        <Text variant="caption">
+          Page {currentPage} of {totalPages} ({filteredAndSortedData.length} total)
         </Text>
 
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
           <Button
-            variant='outline'
-            size='sm'
+            variant="outline"
+            size="sm"
             onPress={() => handlePageChange(1)}
             disabled={currentPage === 1}
           >
-            <ChevronsLeft
-              size={16}
-              color={currentPage === 1 ? mutedColor : textColor}
-            />
+            <ChevronsLeft size={16} color={currentPage === 1 ? mutedColor : textColor} />
           </Button>
 
           <Button
-            variant='outline'
-            size='sm'
+            variant="outline"
+            size="sm"
             onPress={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
           >
-            <ChevronLeft
-              size={16}
-              color={currentPage === 1 ? mutedColor : textColor}
-            />
+            <ChevronLeft size={16} color={currentPage === 1 ? mutedColor : textColor} />
           </Button>
 
           <Button
-            variant='outline'
-            size='sm'
+            variant="outline"
+            size="sm"
             onPress={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
           >
-            <ChevronRight
-              size={16}
-              color={currentPage === totalPages ? mutedColor : textColor}
-            />
+            <ChevronRight size={16} color={currentPage === totalPages ? mutedColor : textColor} />
           </Button>
 
           <Button
-            variant='outline'
-            size='sm'
+            variant="outline"
+            size="sm"
             onPress={() => handlePageChange(totalPages)}
             disabled={currentPage === totalPages}
           >
-            <ChevronsRight
-              size={16}
-              color={currentPage === totalPages ? mutedColor : textColor}
-            />
+            <ChevronsRight size={16} color={currentPage === totalPages ? mutedColor : textColor} />
           </Button>
         </View>
       </View>
-    );
-  };
+    )
+  }
 
   const renderSearchBar = () => {
-    if (!searchable || !filterable) return null;
+    if (!searchable || !filterable) return null
 
     return (
       <View
         style={{
-          flexDirection: 'row',
-          alignItems: 'center',
+          flexDirection: "row",
+          alignItems: "center",
           backgroundColor: cardColor,
           borderBottomWidth: 1,
           borderColor: borderColor,
@@ -395,61 +364,61 @@ export function Table<T = any>({
         <Search size={16} color={mutedColor} style={{ marginRight: 8 }} />
 
         <TextInput
-          style={{
+          style={withGeistFont({
             flex: 1,
             fontSize: FONT_SIZE,
             color: textColor,
             paddingVertical: 8,
-          }}
+          })}
           placeholder={searchPlaceholder}
           placeholderTextColor={mutedColor}
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
       </View>
-    );
-  };
+    )
+  }
 
   const renderEmptyState = () => (
     <View
       style={{
         padding: 32,
-        alignItems: 'center',
-        justifyContent: 'center',
+        alignItems: "center",
+        justifyContent: "center",
         backgroundColor: cardColor,
       }}
     >
-      <Text variant='body' style={{ color: mutedColor }}>
+      <Text variant="body" style={{ color: mutedColor }}>
         {emptyMessage}
       </Text>
     </View>
-  );
+  )
 
   const renderLoadingState = () => (
     <View
       style={{
         padding: 32,
-        alignItems: 'center',
-        justifyContent: 'center',
+        alignItems: "center",
+        justifyContent: "center",
         backgroundColor: cardColor,
       }}
     >
-      <Text variant='body' style={{ color: mutedColor }}>
+      <Text variant="body" style={{ color: mutedColor }}>
         Loading...
       </Text>
     </View>
-  );
+  )
 
   return (
     <View
       style={[
         {
-          width: '100%',
+          width: "100%",
           borderRadius: BORDER_RADIUS,
           borderWidth: 1,
           borderColor: borderColor,
           backgroundColor: cardColor,
-          overflow: 'hidden',
+          overflow: "hidden",
         },
         style,
       ]}
@@ -457,7 +426,7 @@ export function Table<T = any>({
       {renderSearchBar()}
 
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        <View style={{ minWidth: '100%' }}>
+        <View style={{ minWidth: "100%" }}>
           {renderHeader()}
 
           {loading ? (
@@ -474,5 +443,5 @@ export function Table<T = any>({
 
       {renderPagination()}
     </View>
-  );
+  )
 }

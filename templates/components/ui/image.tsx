@@ -1,74 +1,71 @@
-import { Text } from '@/components/ui/text';
-import { View } from '@/components/ui/view';
-import { useColor } from '@/hooks/useColor';
-import { BORDER_RADIUS, CORNERS } from '@/theme/globals';
-import {
-  Image as ExpoImage,
-  ImageProps as ExpoImageProps,
-  ImageSource,
-} from 'expo-image';
-import { forwardRef, useState } from 'react';
-import { ActivityIndicator, StyleSheet } from 'react-native';
+import { forwardRef, useState } from "react"
+import { ActivityIndicator, StyleSheet } from "react-native"
+import { Image as ExpoImage, ImageProps as ExpoImageProps, ImageSource } from "expo-image"
 
-export interface ImageProps extends Omit<ExpoImageProps, 'style'> {
-  variant?: 'rounded' | 'circle' | 'default';
-  source: ImageSource;
-  style?: ExpoImageProps['style'];
-  containerStyle?: any;
-  showLoadingIndicator?: boolean;
-  showErrorFallback?: boolean;
-  errorFallbackText?: string;
-  loadingIndicatorSize?: 'small' | 'large';
-  loadingIndicatorColor?: string;
-  aspectRatio?: number;
-  width?: number | string;
-  height?: number | string;
+import { Text } from "@/components/ui/text"
+import { View } from "@/components/ui/view"
+import { useColor } from "@/hooks/useColor"
+import { BORDER_RADIUS, CORNERS } from "@/theme/globals"
+
+export interface ImageProps extends Omit<ExpoImageProps, "style"> {
+  variant?: "rounded" | "circle" | "default"
+  source: ImageSource
+  style?: ExpoImageProps["style"]
+  containerStyle?: any
+  showLoadingIndicator?: boolean
+  showErrorFallback?: boolean
+  errorFallbackText?: string
+  loadingIndicatorSize?: "small" | "large"
+  loadingIndicatorColor?: string
+  aspectRatio?: number
+  width?: number | string
+  height?: number | string
 }
 
 export const Image = forwardRef<ExpoImage, ImageProps>(
   (
     {
-      variant = 'rounded',
+      variant = "rounded",
       source,
       style,
       containerStyle,
       showLoadingIndicator = true,
       showErrorFallback = true,
-      errorFallbackText = 'Failed to load image',
-      loadingIndicatorSize = 'small',
+      errorFallbackText = "Failed to load image",
+      loadingIndicatorSize = "small",
       loadingIndicatorColor,
       aspectRatio,
       width,
       height,
-      contentFit = 'cover',
+      contentFit = "cover",
       transition = 200,
       ...props
     },
-    ref
+    ref,
   ) => {
-    const [isLoading, setIsLoading] = useState(true);
-    const [hasError, setHasError] = useState(false);
+    const [isLoading, setIsLoading] = useState(true)
+    const [hasError, setHasError] = useState(false)
 
     // Theme colors
-    const backgroundColor = useColor('muted');
-    const textColor = useColor('mutedForeground');
-    const primaryColor = useColor('primary');
+    const backgroundColor = useColor("muted")
+    const textColor = useColor("mutedForeground")
+    const primaryColor = useColor("primary")
 
     // Get border radius based on variant
     const getBorderRadius = () => {
       switch (variant) {
-        case 'circle':
-          return CORNERS;
-        case 'rounded':
-          return BORDER_RADIUS;
-        case 'default':
-          return 0;
+        case "circle":
+          return CORNERS
+        case "rounded":
+          return BORDER_RADIUS
+        case "default":
+          return 0
         default:
-          return BORDER_RADIUS;
+          return BORDER_RADIUS
       }
-    };
+    }
 
-    const borderRadius = getBorderRadius();
+    const borderRadius = getBorderRadius()
 
     // Container dimensions - fill container by default, or use provided dimensions
     const containerDimensions =
@@ -78,34 +75,33 @@ export const Image = forwardRef<ExpoImage, ImageProps>(
             ...(height ? { height } : {}),
             ...(aspectRatio ? { aspectRatio } : {}),
           }
-        : { width: '100%', height: '100%' };
+        : { width: "100%", height: "100%" }
 
     // Image styles - always fill the container
-    const imageStyles = [
-      { width: '100%', height: '100%', borderRadius },
-      style,
-    ].filter(Boolean) as ExpoImageProps['style'];
+    const imageStyles = [{ width: "100%", height: "100%", borderRadius }, style].filter(
+      Boolean,
+    ) as ExpoImageProps["style"]
 
     const containerStyles = [
       styles.container,
       containerDimensions,
       { borderRadius, backgroundColor },
       containerStyle,
-    ];
+    ]
 
     const handleLoadStart = () => {
-      setIsLoading(true);
-      setHasError(false);
-    };
+      setIsLoading(true)
+      setHasError(false)
+    }
 
     const handleLoadEnd = () => {
-      setIsLoading(false);
-    };
+      setIsLoading(false)
+    }
 
     const handleError = () => {
-      setIsLoading(false);
-      setHasError(true);
-    };
+      setIsLoading(false)
+      setHasError(true)
+    }
 
     return (
       <View style={containerStyles}>
@@ -135,7 +131,7 @@ export const Image = forwardRef<ExpoImage, ImageProps>(
         {hasError && showErrorFallback && (
           <View style={[styles.overlay, styles.errorContainer]}>
             <Text
-              variant='caption'
+              variant="caption"
               style={[styles.errorText, { color: textColor }]}
               numberOfLines={2}
             >
@@ -144,31 +140,31 @@ export const Image = forwardRef<ExpoImage, ImageProps>(
           </View>
         )}
       </View>
-    );
-  }
-);
+    )
+  },
+)
 
 const styles = StyleSheet.create({
   container: {
-    position: 'relative',
-    overflow: 'hidden',
-  },
-  overlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
+    overflow: "hidden",
+    position: "relative",
   },
   errorContainer: {
     padding: 8,
   },
   errorText: {
-    textAlign: 'center',
     fontSize: 12,
+    textAlign: "center",
   },
-});
+  overlay: {
+    alignItems: "center",
+    bottom: 0,
+    justifyContent: "center",
+    left: 0,
+    position: "absolute",
+    right: 0,
+    top: 0,
+  },
+})
 
-Image.displayName = 'Image';
+Image.displayName = "Image"

@@ -1,87 +1,72 @@
-import { useColor } from '@/hooks/useColor';
-import { BORDER_RADIUS } from '@/theme/globals';
-import { useEvent } from 'expo';
-import { useVideoPlayer, VideoSource, VideoView } from 'expo-video';
-import { Pause, Play, Volume2, VolumeX } from 'lucide-react-native';
-import React, {
-  forwardRef,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
-import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  ViewStyle,
-} from 'react-native';
-import {
-  Gesture,
-  GestureDetector,
-  GestureHandlerRootView,
-} from 'react-native-gesture-handler';
+import React, { forwardRef, useCallback, useEffect, useRef, useState } from "react"
+import { StyleSheet, Text, TouchableOpacity, View, ViewStyle } from "react-native"
+import { useEvent } from "expo"
+import { useVideoPlayer, VideoSource, VideoView } from "expo-video"
+import { Pause, Play, Volume2, VolumeX } from "lucide-react-native"
+import { Gesture, GestureDetector, GestureHandlerRootView } from "react-native-gesture-handler"
 import Animated, {
   runOnJS,
   useAnimatedStyle,
   useDerivedValue,
   useSharedValue,
   withTiming,
-} from 'react-native-reanimated';
+} from "react-native-reanimated"
+
+import { useColor } from "@/hooks/useColor"
+import { BORDER_RADIUS } from "@/theme/globals"
 
 interface VideoProps {
-  source: VideoSource;
-  style?: ViewStyle;
-  seekBy?: number; // seconds to seek by on double tap
-  autoPlay?: boolean;
-  loop?: boolean;
-  muted?: boolean;
-  nativeControls?: boolean;
-  showControls?: boolean;
-  allowsFullscreen?: boolean;
-  allowsPictureInPicture?: boolean;
-  contentFit?: 'contain' | 'cover' | 'fill';
-  onLoad?: () => void;
-  onError?: (error: any) => void;
-  onPlaybackStatusUpdate?: (status: any) => void;
-  onFullscreenUpdate?: (isFullscreen: boolean) => void;
+  source: VideoSource
+  style?: ViewStyle
+  seekBy?: number // seconds to seek by on double tap
+  autoPlay?: boolean
+  loop?: boolean
+  muted?: boolean
+  nativeControls?: boolean
+  showControls?: boolean
+  allowsFullscreen?: boolean
+  allowsPictureInPicture?: boolean
+  contentFit?: "contain" | "cover" | "fill"
+  onLoad?: () => void
+  onError?: (error: any) => void
+  onPlaybackStatusUpdate?: (status: any) => void
+  onFullscreenUpdate?: (isFullscreen: boolean) => void
   subtitles?: Array<{
-    start: number;
-    end: number;
-    text: string;
-  }>;
+    start: number
+    end: number
+    text: string
+  }>
 }
 
 interface VideoRef {
-  play: () => void;
-  pause: () => void;
-  seekTo: (seconds: number) => void;
-  setVolume: (volume: number) => void;
-  getCurrentTime: () => number;
-  getDuration: () => number;
-  isPlaying: () => boolean;
-  isMuted: () => boolean;
+  play: () => void
+  pause: () => void
+  seekTo: (seconds: number) => void
+  setVolume: (volume: number) => void
+  getCurrentTime: () => number
+  getDuration: () => number
+  isPlaying: () => boolean
+  isMuted: () => boolean
 }
 
 // Helper function to format time
 const formatTime = (seconds: number): string => {
-  if (isNaN(seconds) || seconds < 0) return '0:00';
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60);
-  return `${mins}:${secs.toString().padStart(2, '0')}`;
-};
+  if (isNaN(seconds) || seconds < 0) return "0:00"
+  const mins = Math.floor(seconds / 60)
+  const secs = Math.floor(seconds % 60)
+  return `${mins}:${secs.toString().padStart(2, "0")}`
+}
 
 // --- Custom Reanimated Progress Bar ---
-const PROGRESS_HEIGHT = 8;
-const THUMB_SIZE = 16;
+const PROGRESS_HEIGHT = 8
+const THUMB_SIZE = 16
 
 interface ReanimatedProgressProps {
-  duration: number;
-  currentTime: number;
-  onSeek: (progress: number) => void;
-  onSeekStart?: () => void;
-  onSeekEnd?: () => void;
+  duration: number
+  currentTime: number
+  onSeek: (progress: number) => void
+  onSeekStart?: () => void
+  onSeekEnd?: () => void
 }
 
 const ReanimatedProgress = ({
@@ -91,60 +76,57 @@ const ReanimatedProgress = ({
   onSeekStart,
   onSeekEnd,
 }: ReanimatedProgressProps) => {
-  const [barWidth, setBarWidth] = useState(0);
-  const isScrubbing = useSharedValue(false);
-  const translateX = useSharedValue(0);
-  const scale = useSharedValue(1);
+  const [barWidth, setBarWidth] = useState(0)
+  const isScrubbing = useSharedValue(false)
+  const translateX = useSharedValue(0)
+  const scale = useSharedValue(1)
 
   useDerivedValue(() => {
     if (!isScrubbing.value && duration > 0 && barWidth > 0) {
-      const progress = currentTime / duration;
-      translateX.value = withTiming(progress * barWidth, { duration: 100 });
+      const progress = currentTime / duration
+      translateX.value = withTiming(progress * barWidth, { duration: 100 })
     }
-  });
+  })
 
   const panGesture = Gesture.Pan()
     .minDistance(1)
     .onBegin(() => {
-      isScrubbing.value = true;
-      scale.value = withTiming(1.2);
-      if (onSeekStart) runOnJS(onSeekStart)();
+      isScrubbing.value = true
+      scale.value = withTiming(1.2)
+      if (onSeekStart) runOnJS(onSeekStart)()
     })
     .onChange((event) => {
-      translateX.value = Math.max(
-        0,
-        Math.min(barWidth, translateX.value + event.changeX)
-      );
+      translateX.value = Math.max(0, Math.min(barWidth, translateX.value + event.changeX))
     })
     .onEnd(() => {
-      const finalProgress = translateX.value / barWidth;
-      runOnJS(onSeek)(finalProgress);
-      isScrubbing.value = false;
-      scale.value = withTiming(1);
-      if (onSeekEnd) runOnJS(onSeekEnd)();
-    });
+      const finalProgress = translateX.value / barWidth
+      runOnJS(onSeek)(finalProgress)
+      isScrubbing.value = false
+      scale.value = withTiming(1)
+      if (onSeekEnd) runOnJS(onSeekEnd)()
+    })
 
   const tapGesture = Gesture.Tap()
     .onBegin(() => {
-      if (onSeekStart) runOnJS(onSeekStart)();
+      if (onSeekStart) runOnJS(onSeekStart)()
     })
     .onEnd((event) => {
-      const newTranslateX = Math.max(0, Math.min(barWidth, event.x));
-      translateX.value = newTranslateX;
-      const finalProgress = newTranslateX / barWidth;
-      runOnJS(onSeek)(finalProgress);
-      if (onSeekEnd) runOnJS(onSeekEnd)();
-    });
+      const newTranslateX = Math.max(0, Math.min(barWidth, event.x))
+      translateX.value = newTranslateX
+      const finalProgress = newTranslateX / barWidth
+      runOnJS(onSeek)(finalProgress)
+      if (onSeekEnd) runOnJS(onSeekEnd)()
+    })
 
-  const composedGesture = Gesture.Race(panGesture, tapGesture);
+  const composedGesture = Gesture.Race(panGesture, tapGesture)
 
   const animatedProgressStyle = useAnimatedStyle(() => ({
     width: translateX.value,
-  }));
+  }))
 
   const animatedThumbStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: translateX.value }, { scale: scale.value }],
-  }));
+  }))
 
   return (
     <GestureDetector gesture={composedGesture}>
@@ -153,18 +135,14 @@ const ReanimatedProgress = ({
         onLayout={(e) => setBarWidth(e.nativeEvent.layout.width)}
       >
         <View style={progressStyles.track} />
-        <Animated.View
-          style={[progressStyles.progress, animatedProgressStyle]}
-        />
-        <Animated.View
-          style={[progressStyles.thumbContainer, animatedThumbStyle]}
-        >
+        <Animated.View style={[progressStyles.progress, animatedProgressStyle]} />
+        <Animated.View style={[progressStyles.thumbContainer, animatedThumbStyle]}>
           <View style={progressStyles.thumb} />
         </Animated.View>
       </Animated.View>
     </GestureDetector>
-  );
-};
+  )
+}
 
 // --- Main Video Component ---
 export const Video = forwardRef<VideoView, VideoProps>(
@@ -178,7 +156,7 @@ export const Video = forwardRef<VideoView, VideoProps>(
       nativeControls = false,
       allowsFullscreen = true,
       allowsPictureInPicture = true,
-      contentFit = 'cover',
+      contentFit = "cover",
       onLoad,
       onError,
       seekBy = 2,
@@ -187,192 +165,178 @@ export const Video = forwardRef<VideoView, VideoProps>(
       subtitles = [],
       ...props
     },
-    ref
+    ref,
   ) => {
-    const textColor = useColor('text');
-    const cardColor = useColor('card');
-    const mutedColor = useColor('mutedForeground');
+    const textColor = useColor("text")
+    const cardColor = useColor("card")
+    const mutedColor = useColor("mutedForeground")
 
-    const [currentTime, setCurrentTime] = useState(0);
-    const [duration, setDuration] = useState(0);
-    const [isMuted, setIsMuted] = useState(muted);
-    const [currentSubtitle, setCurrentSubtitle] = useState<string>('');
-    const [isVideoEnded, setIsVideoEnded] = useState(false);
-    const [showPlayIcon, setShowPlayIcon] = useState(false);
-    const [showCustomControls, setShowCustomControls] = useState(false);
-    const [isSeeking, setIsSeeking] = useState(false);
+    const [currentTime, setCurrentTime] = useState(0)
+    const [duration, setDuration] = useState(0)
+    const [isMuted, setIsMuted] = useState(muted)
+    const [currentSubtitle, setCurrentSubtitle] = useState<string>("")
+    const [isVideoEnded, setIsVideoEnded] = useState(false)
+    const [showPlayIcon, setShowPlayIcon] = useState(false)
+    const [showCustomControls, setShowCustomControls] = useState(false)
+    const [isSeeking, setIsSeeking] = useState(false)
 
-    const hideControlsTimeout = useRef<number | null>(null);
-    const hidePlayIconTimeout = useRef<number | null>(null);
+    const hideControlsTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
+    const hidePlayIconTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-    const controlsOpacity = useSharedValue(0);
-    const playIconOpacity = useSharedValue(0);
+    const controlsOpacity = useSharedValue(0)
+    const playIconOpacity = useSharedValue(0)
 
     const player = useVideoPlayer(source, (player) => {
       try {
-        if (autoPlay && player.play) player.play();
-        player.loop = loop;
-        player.muted = muted;
-        onLoad?.();
+        if (autoPlay && player.play) player.play()
+        player.loop = loop
+        player.muted = muted
+        onLoad?.()
       } catch (error) {
-        console.error('Video player initialization error:', error);
-        onError?.(error);
+        console.error("Video player initialization error:", error)
+        onError?.(error)
       }
-    });
+    })
 
-    const { isPlaying } = useEvent(player, 'playingChange', {
+    const { isPlaying } = useEvent(player, "playingChange", {
       isPlaying: player?.playing || false,
-    });
+    })
 
     // --- !! EFFECT UPDATED TO RESPECT isSeeking STATE !! ---
     useEffect(() => {
       const interval = setInterval(() => {
         // Only update time from player if the user is not actively seeking
         if (player && !isSeeking) {
-          const time = player.currentTime || 0;
-          const dur = player.duration || 0;
-          setCurrentTime(time);
-          if (dur > 0) setDuration(dur);
+          const time = player.currentTime || 0
+          const dur = player.duration || 0
+          setCurrentTime(time)
+          if (dur > 0) setDuration(dur)
 
-          if (dur > 0 && time >= dur - 0.25 && !loop) setIsVideoEnded(true);
-          else setIsVideoEnded(false);
+          if (dur > 0 && time >= dur - 0.25 && !loop) setIsVideoEnded(true)
+          else setIsVideoEnded(false)
 
-          const activeSubtitle = subtitles.find(
-            (s) => time >= s.start && time <= s.end
-          );
-          setCurrentSubtitle(activeSubtitle?.text || '');
+          const activeSubtitle = subtitles.find((s) => time >= s.start && time <= s.end)
+          setCurrentSubtitle(activeSubtitle?.text || "")
 
           onPlaybackStatusUpdate?.({
             currentTime: time,
             duration: dur,
             isPlaying: player.playing,
-          });
+          })
         }
-      }, 250);
+      }, 250)
 
-      return () => clearInterval(interval);
-    }, [player, subtitles, onPlaybackStatusUpdate, loop, isSeeking]);
+      return () => clearInterval(interval)
+    }, [player, subtitles, onPlaybackStatusUpdate, loop, isSeeking])
 
     const controlsAnimatedStyle = useAnimatedStyle(() => ({
       opacity: controlsOpacity.value,
-    }));
+    }))
 
     const playIconAnimatedStyle = useAnimatedStyle(() => ({
       opacity: playIconOpacity.value,
-    }));
+    }))
 
     const showControls = useCallback(() => {
-      setShowCustomControls(true);
-      controlsOpacity.value = withTiming(1, { duration: 200 });
+      setShowCustomControls(true)
+      controlsOpacity.value = withTiming(1, { duration: 200 })
 
-      if (hideControlsTimeout.current)
-        clearTimeout(hideControlsTimeout.current);
+      if (hideControlsTimeout.current) clearTimeout(hideControlsTimeout.current)
       if (isPlaying) {
         // Only hide controls if video is playing
-        hideControlsTimeout.current = setTimeout(hideControls, 3000);
+        hideControlsTimeout.current = setTimeout(hideControls, 3000)
       }
-    }, [controlsOpacity, isPlaying]);
+    }, [controlsOpacity, isPlaying])
 
     const hideControls = useCallback(() => {
       controlsOpacity.value = withTiming(0, { duration: 200 }, (isFinished) => {
-        if (isFinished) runOnJS(setShowCustomControls)(false);
-      });
-    }, [controlsOpacity]);
+        if (isFinished) runOnJS(setShowCustomControls)(false)
+      })
+    }, [controlsOpacity])
 
     const showPlayIconAnimation = useCallback(() => {
-      setShowPlayIcon(true);
-      playIconOpacity.value = withTiming(1, { duration: 200 });
+      setShowPlayIcon(true)
+      playIconOpacity.value = withTiming(1, { duration: 200 })
 
-      if (hidePlayIconTimeout.current)
-        clearTimeout(hidePlayIconTimeout.current);
+      if (hidePlayIconTimeout.current) clearTimeout(hidePlayIconTimeout.current)
       hidePlayIconTimeout.current = setTimeout(() => {
-        playIconOpacity.value = withTiming(
-          0,
-          { duration: 200 },
-          (isFinished) => {
-            if (isFinished) runOnJS(setShowPlayIcon)(false);
-          }
-        );
-      }, 1000);
-    }, [playIconOpacity]);
+        playIconOpacity.value = withTiming(0, { duration: 200 }, (isFinished) => {
+          if (isFinished) runOnJS(setShowPlayIcon)(false)
+        })
+      }, 1000)
+    }, [playIconOpacity])
 
     const handleSingleTap = useCallback(() => {
-      if (!player) return;
+      if (!player) return
       if (isVideoEnded) {
-        player.currentTime = 0;
-        player.play();
-        setIsVideoEnded(false);
+        player.currentTime = 0
+        player.play()
+        setIsVideoEnded(false)
       } else {
-        player.playing ? player.pause() : player.play();
+        player.playing ? player.pause() : player.play()
       }
-      showPlayIconAnimation();
-      showControls();
-    }, [player, isVideoEnded, showControls, showPlayIconAnimation]);
+      showPlayIconAnimation()
+      showControls()
+    }, [player, isVideoEnded, showControls, showPlayIconAnimation])
 
     const handleLeftDoubleTap = useCallback(() => {
       if (player) {
-        player.seekBy(-seekBy);
-        showControls();
+        player.seekBy(-seekBy)
+        showControls()
       }
-    }, [player, showControls, seekBy]);
+    }, [player, showControls, seekBy])
 
     const handleRightDoubleTap = useCallback(() => {
       if (player) {
-        player.seekBy(seekBy);
-        showControls();
+        player.seekBy(seekBy)
+        showControls()
       }
-    }, [player, showControls, seekBy]);
+    }, [player, showControls, seekBy])
 
     const toggleMute = useCallback(() => {
-      const newMuted = !isMuted;
-      setIsMuted(newMuted);
-      player.muted = newMuted;
-    }, [isMuted, player]);
+      const newMuted = !isMuted
+      setIsMuted(newMuted)
+      player.muted = newMuted
+    }, [isMuted, player])
 
     const handleProgressChange = useCallback(
       (progress: number) => {
-        if (!player || !duration || duration <= 0) return;
-        const newTime = progress * duration;
+        if (!player || !duration || duration <= 0) return
+        const newTime = progress * duration
         // This is the "optimistic update" - we set the local state immediately
-        setCurrentTime(newTime);
-        player.currentTime = newTime;
-        if (isVideoEnded) setIsVideoEnded(false);
+        setCurrentTime(newTime)
+        player.currentTime = newTime
+        if (isVideoEnded) setIsVideoEnded(false)
         // Reset the hide controls timer
-        if (hideControlsTimeout.current)
-          clearTimeout(hideControlsTimeout.current);
-        hideControlsTimeout.current = setTimeout(hideControls, 3000);
+        if (hideControlsTimeout.current) clearTimeout(hideControlsTimeout.current)
+        hideControlsTimeout.current = setTimeout(hideControls, 3000)
       },
-      [player, duration, isVideoEnded, hideControls]
-    );
+      [player, duration, isVideoEnded, hideControls],
+    )
 
     const handleSeekStart = useCallback(() => {
-      setIsSeeking(true);
-      if (hideControlsTimeout.current)
-        clearTimeout(hideControlsTimeout.current);
-    }, []);
+      setIsSeeking(true)
+      if (hideControlsTimeout.current) clearTimeout(hideControlsTimeout.current)
+    }, [])
 
     const handleSeekEnd = useCallback(() => {
-      setIsSeeking(false);
-    }, []);
+      setIsSeeking(false)
+    }, [])
 
     useEffect(() => {
       return () => {
-        if (hideControlsTimeout.current)
-          clearTimeout(hideControlsTimeout.current);
-        if (hidePlayIconTimeout.current)
-          clearTimeout(hidePlayIconTimeout.current);
-      };
-    }, []);
+        if (hideControlsTimeout.current) clearTimeout(hideControlsTimeout.current)
+        if (hidePlayIconTimeout.current) clearTimeout(hidePlayIconTimeout.current)
+      }
+    }, [])
 
     return (
-      <GestureHandlerRootView
-        style={[styles.container, { backgroundColor: cardColor }, style]}
-      >
+      <GestureHandlerRootView style={[styles.container, { backgroundColor: cardColor }, style]}>
         <VideoView
           ref={ref}
           player={player}
           style={styles.video}
-          allowsFullscreen={allowsFullscreen}
+          fullscreenOptions={{ enable: allowsFullscreen }}
           allowsPictureInPicture={allowsPictureInPicture}
           nativeControls={false}
           contentFit={contentFit}
@@ -401,7 +365,7 @@ export const Video = forwardRef<VideoView, VideoProps>(
         {showCustomControls && (
           <Animated.View
             style={[styles.controlsContainer, controlsAnimatedStyle]}
-            pointerEvents='box-none'
+            pointerEvents="box-none"
           >
             <View style={styles.topControls}>
               <TouchableOpacity
@@ -422,9 +386,7 @@ export const Video = forwardRef<VideoView, VideoProps>(
                 <Text style={[styles.timeText, { color: mutedColor }]}>
                   {formatTime(currentTime)}
                 </Text>
-                <Text style={[styles.timeText, { color: mutedColor }]}>
-                  {formatTime(duration)}
-                </Text>
+                <Text style={[styles.timeText, { color: mutedColor }]}>{formatTime(duration)}</Text>
               </View>
 
               <ReanimatedProgress
@@ -438,118 +400,118 @@ export const Video = forwardRef<VideoView, VideoProps>(
           </Animated.View>
         )}
       </GestureHandlerRootView>
-    );
-  }
-);
+    )
+  },
+)
 
-Video.displayName = 'Video';
+Video.displayName = "Video"
 
 const styles = StyleSheet.create({
-  container: {
-    width: '100%',
-    height: '100%',
-    borderRadius: BORDER_RADIUS,
-    overflow: 'hidden',
-  },
-  video: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    width: '100%',
-    height: '100%',
-  },
-  gestureOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    flexDirection: 'row',
-  },
-  gestureArea: { flex: 1, backgroundColor: 'transparent' },
-  gestureAreaCenter: { flex: 2, backgroundColor: 'transparent' },
+  bottomControls: { gap: 6, padding: 16, paddingBottom: 6 },
   centerPlayIcon: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
+    left: "50%",
+    position: "absolute",
+    top: "50%",
     transform: [{ translateX: -40 }, { translateY: -40 }],
     zIndex: 100,
   },
   centerPlayIconBackground: {
-    width: 80,
-    height: 80,
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
     borderRadius: 40,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    height: 80,
+    justifyContent: "center",
+    width: 80,
   },
-  subtitleContainer: {
-    position: 'absolute',
-    bottom: 80,
-    left: 20,
-    right: 20,
-    alignItems: 'center',
+  container: {
+    borderRadius: BORDER_RADIUS,
+    height: "100%",
+    overflow: "hidden",
+    width: "100%",
   },
-  subtitleText: {
-    fontSize: 16,
-    textAlign: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 6,
+  controlButton: {
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    borderRadius: 22,
+    height: 44,
+    justifyContent: "center",
+    width: 44,
   },
   controlsContainer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.3)",
     bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
-    justifyContent: 'space-between',
+    justifyContent: "space-between",
+    left: 0,
+    position: "absolute",
+    right: 0,
+    top: 0,
   },
+  gestureArea: { backgroundColor: "transparent", flex: 1 },
+  gestureAreaCenter: { backgroundColor: "transparent", flex: 2 },
+  gestureOverlay: {
+    bottom: 0,
+    flexDirection: "row",
+    left: 0,
+    position: "absolute",
+    right: 0,
+    top: 0,
+  },
+  subtitleContainer: {
+    alignItems: "center",
+    bottom: 80,
+    left: 20,
+    position: "absolute",
+    right: 20,
+  },
+  subtitleText: {
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
+    borderRadius: 6,
+    fontSize: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    textAlign: "center",
+  },
+  timeContainer: { flexDirection: "row", justifyContent: "space-between" },
+  timeText: { fontSize: 12 },
   topControls: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
+    flexDirection: "row",
+    justifyContent: "flex-end",
     padding: 16,
   },
-  bottomControls: { padding: 16, gap: 6, paddingBottom: 6 },
-  timeContainer: { flexDirection: 'row', justifyContent: 'space-between' },
-  timeText: { fontSize: 12 },
-  controlButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  video: {
+    bottom: 0,
+    height: "100%",
+    left: 0,
+    position: "absolute",
+    right: 0,
+    top: 0,
+    width: "100%",
   },
-});
+})
 const progressStyles = StyleSheet.create({
-  container: { height: THUMB_SIZE * 2, justifyContent: 'center' },
-  track: {
-    height: PROGRESS_HEIGHT,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
-    borderRadius: PROGRESS_HEIGHT / 2,
-  },
+  container: { height: THUMB_SIZE * 2, justifyContent: "center" },
   progress: {
-    height: PROGRESS_HEIGHT,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     borderRadius: PROGRESS_HEIGHT / 2,
-    position: 'absolute',
-  },
-  thumbContainer: {
-    position: 'absolute',
-    top: (THUMB_SIZE * 2 - THUMB_SIZE) / 2,
-    left: -THUMB_SIZE / 2,
+    height: PROGRESS_HEIGHT,
+    position: "absolute",
   },
   thumb: {
-    width: THUMB_SIZE,
-    height: THUMB_SIZE,
+    backgroundColor: "#FFFFFF",
     borderRadius: THUMB_SIZE / 2,
-    backgroundColor: '#FFFFFF',
+    height: THUMB_SIZE,
+    width: THUMB_SIZE,
   },
-});
+  thumbContainer: {
+    left: -THUMB_SIZE / 2,
+    position: "absolute",
+    top: (THUMB_SIZE * 2 - THUMB_SIZE) / 2,
+  },
+  track: {
+    backgroundColor: "rgba(255, 255, 255, 0.3)",
+    borderRadius: PROGRESS_HEIGHT / 2,
+    height: PROGRESS_HEIGHT,
+  },
+})
 
-export type { VideoProps, VideoRef, VideoSource };
+export type { VideoProps, VideoRef, VideoSource }

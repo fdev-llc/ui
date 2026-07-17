@@ -1,23 +1,24 @@
-import { AudioWaveform } from '@/components/ui/audio-waveform';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { Text } from '@/components/ui/text';
-import { useColor } from '@/hooks/useColor';
-import { BORDER_RADIUS } from '@/theme/globals';
-import { AudioSource, useAudioPlayer } from 'expo-audio';
-import { Pause, Play, RotateCcw, Square } from 'lucide-react-native';
-import { useCallback, useEffect, useState } from 'react';
-import { StyleSheet, View, ViewStyle } from 'react-native';
+import { useCallback, useEffect, useState } from "react"
+import { StyleSheet, View, ViewStyle } from "react-native"
+import { AudioSource, useAudioPlayer } from "expo-audio"
+import { Pause, Play, RotateCcw, Square } from "lucide-react-native"
+
+import { AudioWaveform } from "@/components/ui/audio-waveform"
+import { Button } from "@/components/ui/button"
+import { Progress } from "@/components/ui/progress"
+import { Text } from "@/components/ui/text"
+import { useColor } from "@/hooks/useColor"
+import { BORDER_RADIUS } from "@/theme/globals"
 
 export interface AudioPlayerProps {
-  source: AudioSource;
-  style?: ViewStyle;
-  showControls?: boolean;
-  showWaveform?: boolean;
-  showTimer?: boolean;
-  showProgressBar?: boolean;
-  autoPlay?: boolean;
-  onPlaybackStatusUpdate?: (status: any) => void;
+  source: AudioSource
+  style?: ViewStyle
+  showControls?: boolean
+  showWaveform?: boolean
+  showTimer?: boolean
+  showProgressBar?: boolean
+  autoPlay?: boolean
+  onPlaybackStatusUpdate?: (status: any) => void
 }
 
 export function AudioPlayer({
@@ -30,48 +31,48 @@ export function AudioPlayer({
   autoPlay = false,
   onPlaybackStatusUpdate,
 }: AudioPlayerProps) {
-  const player = useAudioPlayer(source);
-  const [duration, setDuration] = useState(0);
-  const [position, setPosition] = useState(0);
-  const [isSeeking, setIsSeeking] = useState(false);
+  const player = useAudioPlayer(source)
+  const [duration, setDuration] = useState(0)
+  const [position, setPosition] = useState(0)
+  const [isSeeking, setIsSeeking] = useState(false)
 
   // Enhanced waveform data - more bars for smoother visualization
   const [waveformData] = useState<number[]>(
     Array.from({ length: 60 }, (_, i) => {
       // Create more varied and realistic waveform pattern
-      const base1 = Math.sin((i / 60) * Math.PI * 6) * 0.4 + 0.5;
-      const base2 = Math.sin((i / 60) * Math.PI * 2.5) * 0.3 + 0.4;
-      const noise = (Math.random() - 0.5) * 0.25;
-      const peak = Math.random() < 0.15 ? Math.random() * 0.4 : 0; // Occasional peaks
-      return Math.max(0.15, Math.min(0.95, (base1 + base2) / 2 + noise + peak));
-    })
-  );
+      const base1 = Math.sin((i / 60) * Math.PI * 6) * 0.4 + 0.5
+      const base2 = Math.sin((i / 60) * Math.PI * 2.5) * 0.3 + 0.4
+      const noise = (Math.random() - 0.5) * 0.25
+      const peak = Math.random() < 0.15 ? Math.random() * 0.4 : 0 // Occasional peaks
+      return Math.max(0.15, Math.min(0.95, (base1 + base2) / 2 + noise + peak))
+    }),
+  )
 
   // Theme colors
-  const redColor = useColor('destructive');
-  const secondaryColor = useColor('secondary');
-  const textColor = useColor('text');
-  const mutedColor = useColor('textMuted');
+  const redColor = useColor("destructive")
+  const secondaryColor = useColor("secondary")
+  const textColor = useColor("text")
+  const mutedColor = useColor("textMuted")
 
   useEffect(() => {
     if (autoPlay && player.isLoaded && !player.playing) {
-      player.play();
+      player.play()
     }
-  }, [autoPlay, player.isLoaded]);
+  }, [autoPlay, player.isLoaded])
 
   useEffect(() => {
     const interval = setInterval(() => {
       if (player.isLoaded && !isSeeking) {
-        const currentTime = player.currentTime || 0;
-        const totalDuration = player.duration || 0;
+        const currentTime = player.currentTime || 0
+        const totalDuration = player.duration || 0
 
-        setDuration(totalDuration);
-        setPosition(currentTime);
+        setDuration(totalDuration)
+        setPosition(currentTime)
 
         // Check if the audio finished
         if (currentTime >= totalDuration && totalDuration > 0) {
-          player.seekTo(0);
-          player.pause(); // Ensure it's paused
+          player.seekTo(0)
+          player.pause() // Ensure it's paused
         }
 
         if (onPlaybackStatusUpdate) {
@@ -80,86 +81,84 @@ export function AudioPlayer({
             playing: player.playing,
             duration: totalDuration,
             position: currentTime,
-          });
+          })
         }
       }
-    }, 100);
+    }, 100)
 
-    return () => clearInterval(interval);
-  }, [player, onPlaybackStatusUpdate, isSeeking]);
+    return () => clearInterval(interval)
+  }, [player, onPlaybackStatusUpdate, isSeeking])
 
   const handlePlayPause = () => {
     if (player.playing) {
-      player.pause();
+      player.pause()
     } else {
-      player.play();
+      player.play()
     }
-  };
+  }
 
   const handleBackFiveSeconds = () => {
-    const newPosition = Math.max(0, position - 5);
-    seekToPosition(newPosition);
-  };
+    const newPosition = Math.max(0, position - 5)
+    seekToPosition(newPosition)
+  }
 
   const handleRestart = () => {
-    seekToPosition(0);
-  };
+    seekToPosition(0)
+  }
 
   // Unified seeking function
   const seekToPosition = useCallback(
     (newPosition: number) => {
       if (player.isLoaded && duration > 0) {
-        const clampedPosition = Math.max(0, Math.min(duration, newPosition));
-        player.seekTo(clampedPosition);
-        setPosition(clampedPosition);
+        const clampedPosition = Math.max(0, Math.min(duration, newPosition))
+        player.seekTo(clampedPosition)
+        setPosition(clampedPosition)
       }
     },
-    [player, duration]
-  );
+    [player, duration],
+  )
 
   // Handle waveform seeking
   const handleWaveformSeek = useCallback(
     (seekPercentage: number) => {
       if (duration > 0) {
-        const newPosition = (seekPercentage / 100) * duration;
-        seekToPosition(newPosition);
+        const newPosition = (seekPercentage / 100) * duration
+        seekToPosition(newPosition)
       }
     },
-    [duration, seekToPosition]
-  );
+    [duration, seekToPosition],
+  )
 
   // Handle progress bar seeking
   const handleProgressSeek = useCallback(
     (progressValue: number) => {
       if (duration > 0) {
-        const newPosition = (progressValue / 100) * duration;
-        seekToPosition(newPosition);
+        const newPosition = (progressValue / 100) * duration
+        seekToPosition(newPosition)
       }
     },
-    [duration, seekToPosition]
-  );
+    [duration, seekToPosition],
+  )
 
   // Handle seeking start/end for smooth updates
   const handleSeekStart = useCallback(() => {
-    setIsSeeking(true);
-  }, []);
+    setIsSeeking(true)
+  }, [])
 
   const handleSeekEnd = useCallback(() => {
-    setIsSeeking(false);
-  }, []);
+    setIsSeeking(false)
+  }, [])
 
   const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
+    const mins = Math.floor(seconds / 60)
+    const secs = Math.floor(seconds % 60)
+    return `${mins}:${secs.toString().padStart(2, "0")}`
+  }
 
-  const progressPercentage = duration > 0 ? (position / duration) * 100 : 0;
+  const progressPercentage = duration > 0 ? (position / duration) * 100 : 0
 
   return (
-    <View
-      style={[styles.container, { backgroundColor: secondaryColor }, style]}
-    >
+    <View style={[styles.container, { backgroundColor: secondaryColor }, style]}>
       {/* Waveform Visualization with seeking capability */}
       {showWaveform && (
         <View style={styles.waveformContainer}>
@@ -202,8 +201,8 @@ export function AudioPlayer({
       {showControls && (
         <View style={styles.controlsContainer}>
           <Button
-            variant='ghost'
-            size='icon'
+            variant="ghost"
+            size="icon"
             onPress={handleBackFiveSeconds}
             style={styles.controlButton}
             disabled={!player.isLoaded}
@@ -212,22 +211,18 @@ export function AudioPlayer({
           </Button>
 
           <Button
-            size='icon'
-            variant='destructive'
+            size="icon"
+            variant="destructive"
             onPress={handlePlayPause}
             disabled={!player.isLoaded}
             style={styles.playButton}
           >
-            {player.playing ? (
-              <Pause size={24} color='white' />
-            ) : (
-              <Play size={24} color='white' />
-            )}
+            {player.playing ? <Pause size={24} color="white" /> : <Play size={24} color="white" />}
           </Button>
 
           <Button
-            variant='ghost'
-            size='icon'
+            variant="ghost"
+            size="icon"
             onPress={handleRestart}
             style={styles.controlButton}
             disabled={!player.isLoaded}
@@ -240,7 +235,7 @@ export function AudioPlayer({
       {/* Timer */}
       {showTimer && (
         <View style={styles.timerContainer}>
-          <Text variant='caption' style={{ color: mutedColor }}>
+          <Text variant="caption" style={{ color: mutedColor }}>
             {formatTime(position)} / {formatTime(duration)}
           </Text>
         </View>
@@ -249,52 +244,52 @@ export function AudioPlayer({
       {/* Loading State */}
       {!player.isLoaded && (
         <View style={styles.loadingContainer}>
-          <Text variant='caption' style={{ color: mutedColor }}>
+          <Text variant="caption" style={{ color: mutedColor }}>
             Loading audio...
           </Text>
         </View>
       )}
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
   container: {
     borderRadius: BORDER_RADIUS,
-    padding: 16,
     margin: 8,
+    padding: 16,
   },
-  waveformContainer: {
-    alignItems: 'center',
-    marginBottom: 12,
+  controlButton: {
+    height: 40,
+    width: 40,
+  },
+  controlsContainer: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 12,
+    justifyContent: "center",
+    marginBottom: 8,
+  },
+  loadingContainer: {
+    alignItems: "center",
+    padding: 8,
+  },
+  playButton: {
+    height: 56,
+    width: 56,
+  },
+  progressBar: {
+    // Additional styling if needed
   },
   progressContainer: {
     marginBottom: 12,
     paddingHorizontal: 4,
   },
-  progressBar: {
-    // Additional styling if needed
-  },
-  controlsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 12,
-    marginBottom: 8,
-  },
-  controlButton: {
-    width: 40,
-    height: 40,
-  },
-  playButton: {
-    width: 56,
-    height: 56,
-  },
   timerContainer: {
-    alignItems: 'center',
+    alignItems: "center",
   },
-  loadingContainer: {
-    alignItems: 'center',
-    padding: 8,
+  waveformContainer: {
+    alignItems: "center",
+    marginBottom: 12,
   },
-});
+})

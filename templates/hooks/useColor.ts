@@ -1,16 +1,18 @@
-import { useColorScheme } from '@/hooks/useColorScheme';
-import { Colors } from '@/theme/colors';
+import { useColorScheme } from "@/hooks/useColorScheme"
+import { Colors } from "@/theme/colors"
 
 export function useColor(
   colorName: keyof typeof Colors.light & keyof typeof Colors.dark,
-  props?: { light?: string; dark?: string }
+  props?: { light?: string; dark?: string },
 ) {
-  const theme = useColorScheme() ?? 'light';
-  const colorFromProps = props?.[theme];
+  // RN 0.86 ColorSchemeName includes "unspecified" — normalize to light/dark
+  const scheme = useColorScheme()
+  const theme = scheme === "dark" ? "dark" : "light"
+  const colorFromProps = props?.[theme]
 
   if (colorFromProps) {
-    return colorFromProps;
+    return colorFromProps
   } else {
-    return Colors[theme][colorName];
+    return Colors[theme][colorName]
   }
 }
