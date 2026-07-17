@@ -129,6 +129,7 @@ export const Input = forwardRef<TextInput, InputProps>(
       <View style={containerStyle}>
         {/* Input Container */}
         <Pressable
+          accessibilityRole="button"
           style={[getVariantStyle(), disabled && { opacity: 0.6 }]}
           onPress={() => {
             if (!disabled && ref && "current" in ref && ref.current) {
@@ -425,6 +426,7 @@ export const GroupedInputItem = forwardRef<TextInput, GroupedInputItemProps>(
 
     const renderItemContent = () => (
       <Pressable
+        accessibilityRole="button"
         onPress={() => ref && "current" in ref && ref.current?.focus()}
         disabled={disabled}
         style={{ opacity: disabled ? 0.6 : 1 }}

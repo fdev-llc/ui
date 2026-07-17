@@ -295,6 +295,7 @@ export function Toast({
 
               {action && (
                 <TouchableOpacity
+                  accessibilityRole="button"
                   onPress={action.onPress}
                   style={{
                     marginLeft: 12,
@@ -318,6 +319,7 @@ export function Toast({
               )}
 
               <TouchableOpacity
+                accessibilityRole="button"
                 onPress={dismiss}
                 style={{ marginLeft: 8, padding: 4, borderRadius: 8 }}
               >

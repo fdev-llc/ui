@@ -105,7 +105,7 @@ export function AlertDialog({
   return (
     <Modal visible={modalVisible} transparent statusBarTranslucent animationType="none">
       <Animated.View style={[styles.backdrop, rBackdropStyle]}>
-        <TouchableWithoutFeedback onPress={handleBackdropPress}>
+        <TouchableWithoutFeedback accessibilityRole="button" onPress={handleBackdropPress}>
           <Animated.View style={styles.backdropTouchableArea} />
         </TouchableWithoutFeedback>
 

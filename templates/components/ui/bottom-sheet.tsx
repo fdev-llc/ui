@@ -63,7 +63,7 @@ const BottomSheetContent = ({
       <GlassSurface tier="strong" style={StyleSheet.absoluteFill} />
 
       {/* Handle */}
-      <TouchableWithoutFeedback onPress={onHandlePress}>
+      <TouchableWithoutFeedback accessibilityRole="button" onPress={onHandlePress}>
         <View
           style={{
             width: "100%",
@@ -283,7 +283,7 @@ export function BottomSheet({
     <Modal visible={modalVisible} transparent statusBarTranslucent animationType="none">
       <GestureHandlerRootView style={{ flex: 1 }}>
         <Animated.View style={[{ flex: 1, backgroundColor: "rgba(0, 0, 0, 0.8)" }, rBackdropStyle]}>
-          <TouchableWithoutFeedback onPress={handleBackdropPress}>
+          <TouchableWithoutFeedback accessibilityRole="button" onPress={handleBackdropPress}>
             <Animated.View style={{ flex: 1 }} />
           </TouchableWithoutFeedback>
 
