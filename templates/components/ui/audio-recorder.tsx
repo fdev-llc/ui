@@ -60,7 +60,8 @@ export function AudioRecorder({
   const textColor = useColor("text")
   const mutedColor = useColor("textMuted")
   const redColor = useColor("red")
-  const greenColor = useColor("green")
+  const successColor = useColor("success")
+  const destructiveColor = useColor("destructive")
 
   // Animation values using react-native-reanimated
   const recordingPulse = useSharedValue(1)
@@ -302,13 +303,13 @@ export function AudioRecorder({
               onPress={handleDeleteRecording}
               style={styles.controlButton}
             >
-              <Trash2 size={20} color={redColor} />
+              <Trash2 size={20} color={destructiveColor} />
             </Button>
 
             <Button
               variant="default"
               onPress={handleSaveRecording}
-              style={[styles.saveButton, { backgroundColor: greenColor }]}
+              style={[styles.saveButton, { backgroundColor: successColor }]}
             >
               <Download size={20} color="white" />
               <Text style={{ color: "white", marginLeft: 8 }}>Save</Text>

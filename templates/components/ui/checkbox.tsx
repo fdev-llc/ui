@@ -26,7 +26,7 @@ export function Checkbox({
 }: CheckboxProps) {
   const primary = useColor("primary")
   const primaryForegroundColor = useColor("primaryForeground")
-  const danger = useColor("red")
+  const danger = useColor("destructive")
   const borderColor = useColor("border")
 
   return (

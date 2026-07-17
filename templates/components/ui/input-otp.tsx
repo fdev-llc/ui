@@ -12,6 +12,7 @@ import {
 
 import { Text } from "@/components/ui/text"
 import { useColor } from "@/hooks/useColor"
+import { withAlpha } from "@/theme/colorUtils"
 import { CORNERS, FONT_SIZE } from "@/theme/globals"
 
 export interface InputOTPProps extends Omit<TextInputProps, "style" | "value" | "onChangeText"> {
@@ -79,7 +80,7 @@ export const InputOTP = forwardRef<InputOTPRef, InputOTPProps>(
     const muted = useColor("textMuted")
     const borderColor = useColor("border")
     const primary = useColor("primary")
-    const danger = useColor("red")
+    const danger = useColor("destructive")
     const background = useColor("background")
 
     // Normalize value to ensure it doesn't exceed length
@@ -176,7 +177,7 @@ export const InputOTP = forwardRef<InputOTPRef, InputOTPProps>(
                     : hasValue
                       ? borderColor
                       : borderColor,
-                backgroundColor: disabled ? muted + "20" : cardColor,
+                backgroundColor: disabled ? withAlpha(muted, 0.125) : cardColor,
                 justifyContent: "center",
                 alignItems: "center",
                 opacity: disabled ? 0.6 : 1,

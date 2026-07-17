@@ -31,6 +31,18 @@ const lightColors = {
   destructive: '#ef4444',
   destructiveForeground: '#FFFFFF',
 
+  // Semantic state colors
+  success: '#22c55e',
+  successForeground: '#FFFFFF',
+  warning: '#f59e0b',
+
+  // Status tokens mirror their semantic twin by design (web parity: --status-success
+  // resolves to --success, --status-error to --destructive, and so on). Keep them equal.
+  statusSuccess: '#22c55e',
+  statusError: '#ef4444',
+  statusWarning: '#f59e0b',
+  statusInProgress: '#18181b',
+
   // Border and input
   border: '#C6C6C8',
   input: '#e4e4e7',
@@ -107,6 +119,18 @@ const darkColors = {
   destructive: '#dc2626',
   destructiveForeground: '#FFFFFF',
 
+  // Semantic state colors
+  success: '#16a34a',
+  successForeground: '#FFFFFF',
+  warning: '#d97706',
+
+  // Status tokens mirror their semantic twin by design (web parity: --status-success
+  // resolves to --success, --status-error to --destructive, and so on). Keep them equal.
+  statusSuccess: '#16a34a',
+  statusError: '#dc2626',
+  statusWarning: '#d97706',
+  statusInProgress: '#e4e4e7',
+
   // Border and input - using alpha values for better blending
   border: '#38383A',
   input: 'rgba(255, 255, 255, 0.15)',
@@ -160,46 +184,3 @@ export { darkColors, lightColors };
 
 // Utility type for color keys
 export type ColorKeys = keyof typeof lightColors;
-
-// Helper function to get color with opacity (useful for React Native)
-export const withOpacity = (color: string, opacity: number) => {
-  // Handle rgba colors
-  if (color.startsWith('rgba')) {
-    return color;
-  }
-
-  // Handle hex colors
-  if (color.startsWith('#')) {
-    const hex = color.replace('#', '');
-    const r = parseInt(hex.substr(0, 2), 16);
-    const g = parseInt(hex.substr(2, 2), 16);
-    const b = parseInt(hex.substr(4, 2), 16);
-    return `rgba(${r}, ${g}, ${b}, ${opacity})`;
-  }
-
-  return color;
-};
-
-// Semantic color mappings for common UI patterns
-export const semanticColors = {
-  light: {
-    success: '#22c55e',
-    successForeground: '#ffffff',
-    warning: '#f59e0b',
-    warningForeground: '#ffffff',
-    info: '#3b82f6',
-    infoForeground: '#ffffff',
-    error: '#ef4444',
-    errorForeground: '#ffffff',
-  },
-  dark: {
-    success: '#16a34a',
-    successForeground: '#ffffff',
-    warning: '#d97706',
-    warningForeground: '#ffffff',
-    info: '#2563eb',
-    infoForeground: '#ffffff',
-    error: '#dc2626',
-    errorForeground: '#ffffff',
-  },
-};

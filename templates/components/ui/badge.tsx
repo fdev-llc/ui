@@ -22,7 +22,7 @@ export function Badge({ children, variant = "default", style, textStyle }: Badge
   const destructiveColor = useColor("destructive")
   const destructiveForegroundColor = useColor("destructiveForeground")
   const borderColor = useColor("border")
-  const successColor = useColor("green")
+  const successColor = useColor("success")
 
   const getBadgeStyle = (): ViewStyle => {
     const baseStyle: ViewStyle = {

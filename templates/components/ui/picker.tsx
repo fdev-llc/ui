@@ -81,7 +81,7 @@ export function Picker({
   const text = useColor("text")
   const muted = useColor("mutedForeground")
   const cardColor = useColor("card")
-  const danger = useColor("red")
+  const danger = useColor("destructive")
   const accent = useColor("accent")
   const primary = useColor("primary")
   const primaryForeground = useColor("primaryForeground")

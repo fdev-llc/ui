@@ -14,7 +14,7 @@ interface SwitchProps extends RNSwitchProps {
 export function Switch({ label, error, labelStyle, ...props }: SwitchProps) {
   const mutedColor = useColor("muted")
   const primary = useColor("primary")
-  const danger = useColor("red")
+  const danger = useColor("destructive")
 
   return (
     <View style={{ marginBottom: 8 }}>

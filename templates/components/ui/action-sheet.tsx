@@ -120,7 +120,7 @@ function AndroidActionSheet({
   const textColor = useColor("text")
   const mutedColor = useColor("textMuted")
   const borderColor = useColor("border")
-  const destructiveColor = useColor("red")
+  const destructiveColor = useColor("destructive")
 
   useEffect(() => {
     if (visible) {

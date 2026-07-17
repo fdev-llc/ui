@@ -5,6 +5,7 @@ import { LucideProps } from "lucide-react-native"
 import { Icon } from "@/components/ui/icon"
 import { Text } from "@/components/ui/text"
 import { useColor } from "@/hooks/useColor"
+import { withAlpha } from "@/theme/colorUtils"
 import { CONTROL_FONT_SIZE, FONT_SIZE, HEIGHT, RADIUS } from "@/theme/globals"
 import { withGeistFont } from "@/theme/typography"
 
@@ -54,7 +55,8 @@ export const Input = forwardRef<TextInput, InputProps>(
     const muted = useColor("textMuted")
     const borderColor = useColor("border")
     const primary = useColor("primary")
-    const danger = useColor("red")
+    const ring = useColor("ring")
+    const danger = useColor("destructive")
 
     const isTextarea = type === "textarea"
 
@@ -82,7 +84,7 @@ export const Input = forwardRef<TextInput, InputProps>(
           return {
             ...baseStyle,
             borderWidth: 1,
-            borderColor: error ? danger : isFocused ? primary : borderColor,
+            borderColor: error ? danger : isFocused ? ring : borderColor,
             backgroundColor: "transparent",
           }
         case "filled":
@@ -91,7 +93,7 @@ export const Input = forwardRef<TextInput, InputProps>(
             ...baseStyle,
             borderWidth: 1,
             borderColor: error ? danger : cardColor,
-            backgroundColor: disabled ? muted + "20" : cardColor,
+            backgroundColor: disabled ? withAlpha(muted, 0.125) : cardColor,
           }
       }
     }
@@ -189,7 +191,7 @@ export const Input = forwardRef<TextInput, InputProps>(
                 multiline
                 numberOfLines={rows}
                 style={withGeistFont([getInputStyle(), inputStyle])}
-                placeholderTextColor={error ? danger + "99" : muted}
+                placeholderTextColor={error ? withAlpha(danger, 0.6) : muted}
                 placeholder={placeholder || "Type your message..."}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
@@ -242,7 +244,7 @@ export const Input = forwardRef<TextInput, InputProps>(
                 <TextInput
                   ref={ref}
                   style={withGeistFont([getInputStyle(), inputStyle])}
-                  placeholderTextColor={error ? danger + 99 : muted}
+                  placeholderTextColor={error ? withAlpha(danger, 0.6) : muted}
                   onFocus={handleFocus}
                   onBlur={handleBlur}
                   editable={!disabled}
@@ -296,7 +298,7 @@ export const GroupedInput = ({
 }: GroupedInputProps) => {
   const border = useColor("border")
   const background = useColor("card")
-  const danger = useColor("red")
+  const danger = useColor("destructive")
 
   const childrenArray = React.Children.toArray(children)
 
@@ -402,7 +404,7 @@ export const GroupedInputItem = forwardRef<TextInput, GroupedInputItemProps>(
     const text = useColor("text")
     const muted = useColor("textMuted")
     const primary = useColor("primary")
-    const danger = useColor("red")
+    const danger = useColor("destructive")
 
     const isTextarea = type === "textarea"
 
@@ -498,7 +500,7 @@ export const GroupedInputItem = forwardRef<TextInput, GroupedInputItemProps>(
                   },
                   inputStyle,
                 ])}
-                placeholderTextColor={error ? danger + "99" : muted}
+                placeholderTextColor={error ? withAlpha(danger, 0.6) : muted}
                 placeholder={placeholder || "Type your message..."}
                 editable={!disabled}
                 selectionColor={primary}
@@ -561,7 +563,7 @@ export const GroupedInputItem = forwardRef<TextInput, GroupedInputItemProps>(
                     inputStyle,
                   ])}
                   placeholder={placeholder}
-                  placeholderTextColor={error ? danger + "99" : muted}
+                  placeholderTextColor={error ? withAlpha(danger, 0.6) : muted}
                   editable={!disabled}
                   selectionColor={primary}
                   onFocus={handleFocus}

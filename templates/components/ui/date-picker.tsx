@@ -135,7 +135,7 @@ export function DatePicker(props: DatePickerProps) {
   const textMutedColor = useColor("textMuted")
   const mutedForegroundColor = useColor("mutedForeground")
   const textColor = useColor("text")
-  const errorColor = useColor("red")
+  const errorColor = useColor("destructive")
 
   const formatDisplayValue = useCallback(() => {
     if (mode === "range") {
