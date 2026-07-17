@@ -1,4 +1,4 @@
-import React from "react"
+import type { ComponentType } from "react"
 import { LucideProps } from "lucide-react-native"
 
 import { useColor } from "@/hooks/useColor"
@@ -6,7 +6,7 @@ import { useColor } from "@/hooks/useColor"
 export type Props = LucideProps & {
   lightColor?: string
   darkColor?: string
-  name: React.ComponentType<LucideProps>
+  name: ComponentType<LucideProps>
 }
 
 export function Icon({

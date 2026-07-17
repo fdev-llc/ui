@@ -1,4 +1,4 @@
-import { TextStyle, ViewStyle } from "react-native"
+import { StyleSheet, TextStyle, ViewStyle } from "react-native"
 
 import { GlassSurface } from "@/components/ui/glass"
 import { Text } from "@/components/ui/text"
@@ -15,21 +15,8 @@ export function Card({ children, style }: CardProps) {
   const foregroundColor = useColor("foreground")
 
   return (
-    <View
-      style={[
-        {
-          width: "100%",
-          borderRadius: RADIUS["4xl"],
-          shadowColor: foregroundColor,
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.05,
-          shadowRadius: 3,
-          elevation: 2,
-        },
-        style,
-      ]}
-    >
-      <GlassSurface tier="soft" style={{ borderRadius: RADIUS["4xl"], padding: 18 }}>
+    <View style={[styles.card, { shadowColor: foregroundColor }, style]}>
+      <GlassSurface tier="soft" style={styles.surface}>
         {children}
       </GlassSurface>
     </View>
@@ -42,7 +29,7 @@ interface CardHeaderProps {
 }
 
 export function CardHeader({ children, style }: CardHeaderProps) {
-  return <View style={[{ marginBottom: 8 }, style]}>{children}</View>
+  return <View style={[styles.header, style]}>{children}</View>
 }
 
 interface CardTitleProps {
@@ -52,15 +39,7 @@ interface CardTitleProps {
 
 export function CardTitle({ children, style }: CardTitleProps) {
   return (
-    <Text
-      variant="title"
-      style={[
-        {
-          marginBottom: 4,
-        },
-        style,
-      ]}
-    >
+    <Text variant="title" style={[styles.title, style]}>
       {children}
     </Text>
   )
@@ -94,18 +73,31 @@ interface CardFooterProps {
 }
 
 export function CardFooter({ children, style }: CardFooterProps) {
-  return (
-    <View
-      style={[
-        {
-          marginTop: 16,
-          flexDirection: "row",
-          gap: 8,
-        },
-        style,
-      ]}
-    >
-      {children}
-    </View>
-  )
+  return <View style={[styles.footer, style]}>{children}</View>
 }
+
+const styles = StyleSheet.create({
+  card: {
+    borderRadius: RADIUS["4xl"],
+    elevation: 2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    width: "100%",
+  },
+  footer: {
+    flexDirection: "row",
+    gap: 8,
+    marginTop: 16,
+  },
+  header: {
+    marginBottom: 8,
+  },
+  surface: {
+    borderRadius: RADIUS["4xl"],
+    padding: 18,
+  },
+  title: {
+    marginBottom: 4,
+  },
+})

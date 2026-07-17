@@ -2,6 +2,7 @@ import { forwardRef } from "react"
 import {
   Platform,
   Pressable,
+  StyleSheet,
   TextStyle,
   TouchableOpacity,
   TouchableOpacityProps,
@@ -311,7 +312,7 @@ export const Button = forwardRef<View, ButtonProps>(
       const styleArray = Array.isArray(style) ? style : [style]
       return styleArray.map((s) => {
         if (s && typeof s === "object" && "flex" in s) {
-          const { flex, ...restStyle } = s
+          const { flex: _flex, ...restStyle } = s
           return restStyle
         }
         return s
@@ -338,12 +339,12 @@ export const Button = forwardRef<View, ButtonProps>(
           {loading ? (
             <ButtonSpinner size={size} variant={loadingVariant} color={contentColor} />
           ) : typeof children === "string" ? (
-            <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+            <View style={styles.content}>
               {icon && <Icon name={icon} color={contentColor} size={iconSize} />}
               <Text style={[finalTextStyle, textStyle]}>{children}</Text>
             </View>
           ) : (
-            <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+            <View style={styles.content}>
               {icon && <Icon name={icon} color={contentColor} size={iconSize} />}
               {children}
             </View>
@@ -353,7 +354,7 @@ export const Button = forwardRef<View, ButtonProps>(
     ) : (
       <TouchableOpacity
         ref={ref}
-        style={[buttonStyle, disabled && { opacity: 0.5 }, styleWithoutFlex]}
+        style={[buttonStyle, disabled && styles.disabled, styleWithoutFlex]}
         onPress={handleTouchablePress}
         disabled={disabled || loading}
         activeOpacity={0.8}
@@ -362,7 +363,7 @@ export const Button = forwardRef<View, ButtonProps>(
         {loading ? (
           <ButtonSpinner size={size} variant={loadingVariant} color={contentColor} />
         ) : typeof children === "string" ? (
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+          <View style={styles.content}>
             {icon && <Icon name={icon} color={contentColor} size={iconSize} />}
             <Text style={[finalTextStyle, textStyle]}>{children}</Text>
           </View>
@@ -376,3 +377,14 @@ export const Button = forwardRef<View, ButtonProps>(
 
 // Add display name for better debugging
 Button.displayName = "Button"
+
+const styles = StyleSheet.create({
+  content: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 6,
+  },
+  disabled: {
+    opacity: 0.5,
+  },
+})

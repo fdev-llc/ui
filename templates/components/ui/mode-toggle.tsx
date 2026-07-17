@@ -1,10 +1,10 @@
-import { Pressable, View, ViewStyle } from "react-native"
+import { Pressable, StyleSheet, View, ViewStyle } from "react-native"
 import { Monitor, Moon, Sun } from "lucide-react-native"
 
 import { Icon } from "@/components/ui/icon"
 import { Text } from "@/components/ui/text"
 import { useColor } from "@/hooks/useColor"
-import { CONTROL_FONT_SIZE, RADIUS } from "@/theme/globals"
+import { CONTROL_FONT_SIZE, RADIUS, TRANSPARENT } from "@/theme/globals"
 
 export type ThemePreference = "light" | "dark" | "system"
 
@@ -13,6 +13,8 @@ export interface ModeToggleProps {
   onValueChange: (value: ThemePreference) => void
   /** Required: the kit stays i18n-agnostic, so the caller owns the copy. */
   labels: Record<ThemePreference, string>
+  /** Optional per-option a11y hint. Same reason as `labels`: the copy is the caller's. */
+  hints?: Partial<Record<ThemePreference, string>>
   disabled?: boolean
   style?: ViewStyle
 }
@@ -33,6 +35,7 @@ export function ModeToggle({
   value,
   onValueChange,
   labels,
+  hints,
   disabled = false,
   style,
 }: ModeToggleProps) {
@@ -46,16 +49,9 @@ export function ModeToggle({
     <View
       accessibilityRole="radiogroup"
       style={[
-        {
-          flexDirection: "row",
-          gap: 4,
-          padding: 4,
-          borderRadius: RADIUS["lg"],
-          borderWidth: 1,
-          borderColor,
-          backgroundColor: mutedColor,
-          opacity: disabled ? 0.5 : 1,
-        },
+        styles.group,
+        { borderColor, backgroundColor: mutedColor },
+        disabled && styles.groupDisabled,
         style,
       ]}
     >
@@ -69,22 +65,13 @@ export function ModeToggle({
             accessibilityRole="radio"
             accessibilityState={{ checked: selected, disabled }}
             accessibilityLabel={labels[option.value]}
+            accessibilityHint={hints?.[option.value]}
             disabled={disabled}
             onPress={() => onValueChange(option.value)}
-            style={{
-              flex: 1,
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 6,
-              paddingVertical: 8,
-              paddingHorizontal: 12,
-              borderRadius: RADIUS["md"],
-              backgroundColor: selected ? primaryColor : "transparent",
-            }}
+            style={[styles.option, { backgroundColor: selected ? primaryColor : TRANSPARENT }]}
           >
             <Icon name={option.icon} size={16} color={contentColor} />
-            <Text style={{ fontSize: CONTROL_FONT_SIZE, fontWeight: "500", color: contentColor }}>
+            <Text style={[styles.optionLabel, { color: contentColor }]}>
               {labels[option.value]}
             </Text>
           </Pressable>
@@ -93,3 +80,30 @@ export function ModeToggle({
     </View>
   )
 }
+
+const styles = StyleSheet.create({
+  group: {
+    borderRadius: RADIUS["lg"],
+    borderWidth: 1,
+    flexDirection: "row",
+    gap: 4,
+    padding: 4,
+  },
+  groupDisabled: {
+    opacity: 0.5,
+  },
+  option: {
+    alignItems: "center",
+    borderRadius: RADIUS["md"],
+    flex: 1,
+    flexDirection: "row",
+    gap: 6,
+    justifyContent: "center",
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  optionLabel: {
+    fontSize: CONTROL_FONT_SIZE,
+    fontWeight: "500",
+  },
+})

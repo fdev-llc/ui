@@ -1,4 +1,5 @@
-import React, { useEffect } from "react"
+import { useCallback, useEffect, useState } from "react"
+import type { ReactNode } from "react"
 import { Modal, StyleSheet, TouchableWithoutFeedback, View, ViewStyle } from "react-native"
 import Animated, {
   runOnJS,
@@ -18,12 +19,20 @@ import {
 import { GlassSurface } from "@/components/ui/glass"
 import { RADIUS } from "@/theme/globals"
 
+/**
+ * The scrim is deliberately module-local rather than a `useColor` key or a theme export:
+ * it is the same ink in both schemes (it dims whatever is behind it), so resolving it
+ * per-scheme would invert it, and consumers that vendor only `components/` must not have
+ * to mirror a new theme export to compile this file.
+ */
+const SCRIM = "rgba(0, 0, 0, 0.8)"
+
 export type AlertDialogProps = {
   isVisible: boolean
   onClose: () => void
   title?: string
   description?: string
-  children?: React.ReactNode
+  children?: ReactNode
   confirmText?: string
   cancelText?: string
   onConfirm?: () => void
@@ -48,9 +57,19 @@ export function AlertDialog({
   showCancelButton = true,
   style,
 }: AlertDialogProps) {
-  const [modalVisible, setModalVisible] = React.useState(false)
+  const [modalVisible, setModalVisible] = useState(false)
   const backdropOpacity = useSharedValue(0)
   const cardOpacity = useSharedValue(0)
+
+  const animateClose = () => {
+    "worklet"
+    backdropOpacity.value = withTiming(0, { duration: 300 }, (finished) => {
+      if (finished) {
+        runOnJS(onClose)()
+      }
+    })
+    cardOpacity.value = withTiming(0, { duration: 200 })
+  }
 
   useEffect(() => {
     if (isVisible) {
@@ -74,16 +93,6 @@ export function AlertDialog({
   const rCardFadeStyle = useAnimatedStyle(() => ({
     opacity: cardOpacity.value,
   }))
-
-  const animateClose = () => {
-    "worklet"
-    backdropOpacity.value = withTiming(0, { duration: 300 }, (finished) => {
-      if (finished) {
-        runOnJS(onClose)()
-      }
-    })
-    cardOpacity.value = withTiming(0, { duration: 200 })
-  }
 
   const handleBackdropPress = () => {
     if (dismissible) {
@@ -110,7 +119,16 @@ export function AlertDialog({
         </TouchableWithoutFeedback>
 
         {/* Non-animated outer wrapper: handles rounded corners and clipping */}
-        <GlassSurface tier="strong" style={[styles.roundedWrapper, style]}>
+        <GlassSurface
+          // `accessibilityViewIsModal` keeps assistive tech from wandering into the content
+          // the backdrop visually blocks; the role names what the trap actually is.
+          role="alertdialog"
+          accessibilityViewIsModal
+          accessibilityLabel={title}
+          accessibilityHint={description}
+          tier="strong"
+          style={[styles.roundedWrapper, style]}
+        >
           {/* Only fade the inner content */}
           <Animated.View style={[styles.innerContent, rCardFadeStyle]}>
             <View style={styles.body}>
@@ -127,7 +145,7 @@ export function AlertDialog({
                     {cancelText}
                   </Button>
                 )}
-                <Button style={{ flex: 1 }} onPress={handleConfirm}>
+                <Button style={styles.confirmButton} onPress={handleConfirm}>
                   {confirmText}
                 </Button>
               </CardFooter>
@@ -142,7 +160,7 @@ export function AlertDialog({
 const styles = StyleSheet.create({
   backdrop: {
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.8)",
+    backgroundColor: SCRIM,
     flex: 1,
     justifyContent: "center",
     padding: 24,
@@ -154,25 +172,28 @@ const styles = StyleSheet.create({
     right: 0,
     top: 0,
   },
+  body: {
+    padding: 18,
+  },
+  confirmButton: {
+    flex: 1,
+  },
+  // Inner content can render freely (only opacity is animated)
+  innerContent: {
+    width: "100%",
+  },
   // Rounded corners and clipping consolidated here (non-animated)
   roundedWrapper: {
     borderRadius: RADIUS["xl"],
     overflow: "hidden",
     width: "100%",
   },
-  // Inner content can render freely (only opacity is animated)
-  innerContent: {
-    width: "100%",
-  },
-  body: {
-    padding: 18,
-  },
 })
 
 export function useAlertDialog() {
-  const [isVisible, setIsVisible] = React.useState(false)
-  const open = React.useCallback(() => setIsVisible(true), [])
-  const close = React.useCallback(() => setIsVisible(false), [])
-  const toggle = React.useCallback(() => setIsVisible((v) => !v), [])
+  const [isVisible, setIsVisible] = useState(false)
+  const open = useCallback(() => setIsVisible(true), [])
+  const close = useCallback(() => setIsVisible(false), [])
+  const toggle = useCallback(() => setIsVisible((v) => !v), [])
   return { isVisible, open, close, toggle }
 }

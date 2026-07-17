@@ -1,4 +1,5 @@
-import React, { createContext, useCallback, useContext, useEffect, useState } from "react"
+import { createContext, useCallback, useContext, useEffect, useState } from "react"
+import type { ReactNode } from "react"
 import {
   Platform,
   StyleSheet,
@@ -21,6 +22,7 @@ import Animated, {
 import { GlassSurface } from "@/components/ui/glass"
 import { Text } from "@/components/ui/text"
 import { useColor } from "@/hooks/useColor"
+import { RADIUS } from "@/theme/globals"
 
 export type ToastVariant = "default" | "success" | "error" | "warning" | "info"
 
@@ -237,40 +239,22 @@ export function Toast({
           <GlassSurface tier="strong" style={StyleSheet.absoluteFill} />
 
           {/* Compact state - just icon or indicator */}
-          {!isExpanded && (
-            <View style={{ justifyContent: "center", alignItems: "center" }}>{getIcon()}</View>
-          )}
+          {!isExpanded && <View style={styles.compact}>{getIcon()}</View>}
 
           {/* Expanded state - full content */}
           {isExpanded && (
-            <Animated.View
-              style={[
-                {
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  paddingHorizontal: 16,
-                  paddingVertical: 12,
-                  flexDirection: "row",
-                  alignItems: "center",
-                },
-                animatedContentStyle,
-              ]}
-            >
-              {getIcon() && <View style={{ marginRight: 12 }}>{getIcon()}</View>}
+            <Animated.View style={[styles.expanded, animatedContentStyle]}>
+              {getIcon() && <View style={styles.iconSlot}>{getIcon()}</View>}
 
-              <View style={{ flex: 1, minWidth: 0 }}>
+              <View style={styles.textColumn}>
                 {title && (
                   <Text
                     variant="subtitle"
-                    style={{
-                      color: foregroundColor,
-                      fontSize: 15,
-                      fontWeight: "600",
-                      marginBottom: description ? 2 : 0,
-                    }}
+                    style={[
+                      styles.title,
+                      description && styles.titleSpaced,
+                      { color: foregroundColor },
+                    ]}
                     numberOfLines={1}
                     ellipsizeMode="tail"
                   >
@@ -280,11 +264,7 @@ export function Toast({
                 {description && (
                   <Text
                     variant="caption"
-                    style={{
-                      color: mutedTextColor,
-                      fontSize: 13,
-                      fontWeight: "400",
-                    }}
+                    style={[styles.description, { color: mutedTextColor }]}
                     numberOfLines={2}
                     ellipsizeMode="tail"
                   >
@@ -297,21 +277,11 @@ export function Toast({
                 <TouchableOpacity
                   accessibilityRole="button"
                   onPress={action.onPress}
-                  style={{
-                    marginLeft: 12,
-                    paddingHorizontal: 12,
-                    paddingVertical: 6,
-                    backgroundColor: getVariantColor(),
-                    borderRadius: 12,
-                  }}
+                  style={[styles.actionChip, { backgroundColor: getVariantColor() }]}
                 >
                   <Text
                     variant="caption"
-                    style={{
-                      color: onStatusFillColor,
-                      fontSize: 12,
-                      fontWeight: "600",
-                    }}
+                    style={[styles.actionLabel, { color: onStatusFillColor }]}
                   >
                     {action.label}
                   </Text>
@@ -321,7 +291,7 @@ export function Toast({
               <TouchableOpacity
                 accessibilityRole="button"
                 onPress={dismiss}
-                style={{ marginLeft: 8, padding: 4, borderRadius: 8 }}
+                style={styles.dismissButton}
               >
                 <X size={14} color={mutedTextColor} />
               </TouchableOpacity>
@@ -346,7 +316,7 @@ interface ToastContextType {
 const ToastContext = createContext<ToastContextType | null>(null)
 
 interface ToastProviderProps {
-  children: React.ReactNode
+  children: ReactNode
   maxToasts?: number
 }
 
@@ -354,6 +324,10 @@ export function ToastProvider({ children, maxToasts = 3 }: ToastProviderProps) {
   const [toasts, setToasts] = useState<ToastData[]>([])
 
   const generateId = () => Math.random().toString(36).substr(2, 9)
+
+  const dismissToast = useCallback((id: string) => {
+    setToasts((prev) => prev.filter((toast) => toast.id !== id))
+  }, [])
 
   const addToast = useCallback(
     (toastData: Omit<ToastData, "id">) => {
@@ -376,12 +350,8 @@ export function ToastProvider({ children, maxToasts = 3 }: ToastProviderProps) {
         }, newToast.duration)
       }
     },
-    [maxToasts],
+    [maxToasts, dismissToast],
   )
-
-  const dismissToast = useCallback((id: string) => {
-    setToasts((prev) => prev.filter((toast) => toast.id !== id))
-  }, [])
 
   const dismissAll = useCallback(() => {
     setToasts([])
@@ -419,7 +389,7 @@ export function ToastProvider({ children, maxToasts = 3 }: ToastProviderProps) {
 
   return (
     <ToastContext.Provider value={contextValue}>
-      <GestureHandlerRootView style={{ flex: 1 }}>
+      <GestureHandlerRootView style={styles.providerRoot}>
         {children}
         <View style={containerStyle} pointerEvents="box-none">
           {toasts.map((toast, index) => (
@@ -441,3 +411,57 @@ export function useToast() {
 
   return context
 }
+
+const styles = StyleSheet.create({
+  actionChip: {
+    borderRadius: RADIUS["lg"],
+    marginLeft: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  actionLabel: {
+    fontSize: 12,
+    fontWeight: "600",
+  },
+  compact: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  description: {
+    fontSize: 13,
+    fontWeight: "400",
+  },
+  dismissButton: {
+    borderRadius: RADIUS["md"],
+    marginLeft: 8,
+    padding: 4,
+  },
+  expanded: {
+    alignItems: "center",
+    bottom: 0,
+    flexDirection: "row",
+    left: 0,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    position: "absolute",
+    right: 0,
+    top: 0,
+  },
+  iconSlot: {
+    marginRight: 12,
+  },
+  providerRoot: {
+    flex: 1,
+  },
+  textColumn: {
+    flex: 1,
+    minWidth: 0,
+  },
+  title: {
+    fontSize: 15,
+    fontWeight: "600",
+  },
+  titleSpaced: {
+    marginBottom: 2,
+  },
+})

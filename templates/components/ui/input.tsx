@@ -1,19 +1,28 @@
-import React, { forwardRef, ReactElement, useState } from "react"
-import { Pressable, TextInput, TextInputProps, TextStyle, View, ViewStyle } from "react-native"
+import { Children, forwardRef, isValidElement, useState } from "react"
+import type { ComponentType, ReactElement, ReactNode } from "react"
+import {
+  Pressable,
+  StyleSheet,
+  TextInput,
+  TextInputProps,
+  TextStyle,
+  View,
+  ViewStyle,
+} from "react-native"
 import { LucideProps } from "lucide-react-native"
 
 import { Icon } from "@/components/ui/icon"
 import { Text } from "@/components/ui/text"
 import { useColor } from "@/hooks/useColor"
 import { withAlpha } from "@/theme/colorUtils"
-import { CONTROL_FONT_SIZE, FONT_SIZE, HEIGHT, RADIUS } from "@/theme/globals"
+import { CONTROL_FONT_SIZE, FONT_SIZE, HEIGHT, RADIUS, TRANSPARENT } from "@/theme/globals"
 import { withGeistFont } from "@/theme/typography"
 
 export interface InputProps extends Omit<TextInputProps, "style"> {
   label?: string
   error?: string
-  icon?: React.ComponentType<LucideProps>
-  rightComponent?: React.ReactNode | (() => React.ReactNode)
+  icon?: ComponentType<LucideProps>
+  rightComponent?: ReactNode | (() => ReactNode)
   containerStyle?: ViewStyle
   inputStyle?: TextStyle
   labelStyle?: TextStyle
@@ -85,7 +94,7 @@ export const Input = forwardRef<TextInput, InputProps>(
             ...baseStyle,
             borderWidth: 1,
             borderColor: error ? danger : isFocused ? ring : borderColor,
-            backgroundColor: "transparent",
+            backgroundColor: TRANSPARENT,
           }
         case "filled":
         default:
@@ -130,7 +139,7 @@ export const Input = forwardRef<TextInput, InputProps>(
         {/* Input Container */}
         <Pressable
           accessibilityRole="button"
-          style={[getVariantStyle(), disabled && { opacity: 0.6 }]}
+          style={[getVariantStyle(), disabled && styles.pressableDisabled]}
           onPress={() => {
             if (!disabled && ref && "current" in ref && ref.current) {
               ref.current.focus()
@@ -143,24 +152,9 @@ export const Input = forwardRef<TextInput, InputProps>(
             <>
               {/* Header section with icon, label, and right component */}
               {(icon || label || rightComponent) && (
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    marginBottom: 8,
-                    gap: 8,
-                  }}
-                >
+                <View style={styles.headerRow}>
                   {/* Left section - Icon + Label */}
-                  <View
-                    style={{
-                      flex: 1,
-                      flexDirection: "row",
-                      alignItems: "center",
-                      gap: 8,
-                    }}
-                    pointerEvents="none"
-                  >
+                  <View style={styles.headerLeft} pointerEvents="none">
                     {icon && <Icon name={icon} size={16} color={error ? danger : muted} />}
                     {label && (
                       <Text
@@ -203,21 +197,10 @@ export const Input = forwardRef<TextInput, InputProps>(
             </>
           ) : (
             // Input Layout (Row)
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 8,
-              }}
-            >
+            <View style={styles.row}>
               {/* Left section - Icon + Label (fixed width to simulate grid column) */}
               <View
-                style={{
-                  width: label ? 120 : "auto",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 8,
-                }}
+                style={[styles.rowLeft, label ? styles.rowLeftLabelled : styles.rowLeftAuto]}
                 pointerEvents="none"
               >
                 {icon && <Icon name={icon} size={16} color={error ? danger : muted} />}
@@ -241,7 +224,7 @@ export const Input = forwardRef<TextInput, InputProps>(
               </View>
 
               {/* TextInput section - takes remaining space */}
-              <View style={{ flex: 1 }}>
+              <View style={styles.inputSlot}>
                 <TextInput
                   ref={ref}
                   style={withGeistFont([getInputStyle(), inputStyle])}
@@ -262,21 +245,7 @@ export const Input = forwardRef<TextInput, InputProps>(
         </Pressable>
 
         {/* Error Message */}
-        {error && (
-          <Text
-            style={[
-              {
-                marginLeft: 14,
-                marginTop: 4,
-                fontSize: CONTROL_FONT_SIZE,
-                color: danger,
-              },
-              errorStyle,
-            ]}
-          >
-            {error}
-          </Text>
-        )}
+        {error && <Text style={[styles.errorText, { color: danger }, errorStyle]}>{error}</Text>}
       </View>
     )
 
@@ -284,8 +253,10 @@ export const Input = forwardRef<TextInput, InputProps>(
   },
 )
 
+Input.displayName = "Input"
+
 export interface GroupedInputProps {
-  children: React.ReactNode
+  children: ReactNode
   containerStyle?: ViewStyle
   title?: string
   titleStyle?: TextStyle
@@ -301,43 +272,31 @@ export const GroupedInput = ({
   const background = useColor("card")
   const danger = useColor("destructive")
 
-  const childrenArray = React.Children.toArray(children)
+  const childrenArray = Children.toArray(children)
 
   const errors = childrenArray
     .filter(
-      (child): child is ReactElement<any> =>
-        React.isValidElement(child) && !!(child.props as any).error,
+      (child): child is ReactElement<any> => isValidElement(child) && !!(child.props as any).error,
     )
     .map((child) => child.props.error)
 
   const renderGroupedContent = () => (
     <View style={containerStyle}>
       {!!title && (
-        <Text variant="title" style={[{ marginBottom: 8, marginLeft: 8 }, titleStyle]}>
+        <Text variant="title" style={[styles.groupTitle, titleStyle]}>
           {title}
         </Text>
       )}
 
-      <View
-        style={{
-          backgroundColor: background,
-          borderColor: border,
-          borderWidth: 1,
-          borderRadius: RADIUS["3xl"],
-          overflow: "hidden",
-        }}
-      >
+      <View style={[styles.group, { backgroundColor: background, borderColor: border }]}>
         {childrenArray.map((child, index) => (
           <View
             key={index}
-            style={{
-              minHeight: HEIGHT,
-              paddingVertical: 12,
-              paddingHorizontal: 16,
-              justifyContent: "center",
-              borderBottomWidth: index !== childrenArray.length - 1 ? 1 : 0,
-              borderColor: border,
-            }}
+            style={[
+              styles.groupRow,
+              index !== childrenArray.length - 1 && styles.groupRowDivided,
+              { borderColor: border },
+            ]}
           >
             {child}
           </View>
@@ -345,16 +304,11 @@ export const GroupedInput = ({
       </View>
 
       {errors.length > 0 && (
-        <View style={{ marginTop: 6 }}>
+        <View style={styles.groupErrors}>
           {errors.map((error, i) => (
             <Text
               key={i}
-              style={{
-                fontSize: CONTROL_FONT_SIZE,
-                color: danger,
-                marginTop: i === 0 ? 0 : 1,
-                marginLeft: 8,
-              }}
+              style={[styles.groupErrorText, i > 0 && styles.groupErrorSpaced, { color: danger }]}
             >
               {error}
             </Text>
@@ -370,11 +324,10 @@ export const GroupedInput = ({
 export interface GroupedInputItemProps extends Omit<TextInputProps, "style"> {
   label?: string
   error?: string
-  icon?: React.ComponentType<LucideProps>
-  rightComponent?: React.ReactNode | (() => React.ReactNode)
+  icon?: ComponentType<LucideProps>
+  rightComponent?: ReactNode | (() => ReactNode)
   inputStyle?: TextStyle
   labelStyle?: TextStyle
-  errorStyle?: TextStyle
   disabled?: boolean
   type?: "input" | "textarea"
   rows?: number // Only used when type="textarea"
@@ -389,7 +342,6 @@ export const GroupedInputItem = forwardRef<TextInput, GroupedInputItemProps>(
       rightComponent,
       inputStyle,
       labelStyle,
-      errorStyle,
       disabled,
       type = "input",
       rows = 3,
@@ -400,8 +352,6 @@ export const GroupedInputItem = forwardRef<TextInput, GroupedInputItemProps>(
     },
     ref,
   ) => {
-    const [isFocused, setIsFocused] = useState(false)
-
     const text = useColor("text")
     const muted = useColor("textMuted")
     const primary = useColor("primary")
@@ -410,12 +360,10 @@ export const GroupedInputItem = forwardRef<TextInput, GroupedInputItemProps>(
     const isTextarea = type === "textarea"
 
     const handleFocus = (e: any) => {
-      setIsFocused(true)
       onFocus?.(e)
     }
 
     const handleBlur = (e: any) => {
-      setIsFocused(false)
       onBlur?.(e)
     }
 
@@ -429,38 +377,17 @@ export const GroupedInputItem = forwardRef<TextInput, GroupedInputItemProps>(
         accessibilityRole="button"
         onPress={() => ref && "current" in ref && ref.current?.focus()}
         disabled={disabled}
-        style={{ opacity: disabled ? 0.6 : 1 }}
+        style={disabled && styles.pressableDisabled}
       >
-        <View
-          style={{
-            flexDirection: isTextarea ? "column" : "row",
-            alignItems: isTextarea ? "stretch" : "center",
-            backgroundColor: "transparent",
-          }}
-        >
+        <View style={[styles.itemBody, isTextarea ? styles.itemBodyColumn : styles.itemBodyRow]}>
           {isTextarea ? (
             // Textarea Layout (Column)
             <>
               {/* Header section with icon, label, and right component */}
               {(icon || label || rightComponent) && (
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    marginBottom: 8,
-                    gap: 8,
-                  }}
-                >
+                <View style={styles.headerRow}>
                   {/* Icon & Label */}
-                  <View
-                    style={{
-                      flex: 1,
-                      flexDirection: "row",
-                      alignItems: "center",
-                      gap: 8,
-                    }}
-                    pointerEvents="none"
-                  >
+                  <View style={styles.headerLeft} pointerEvents="none">
                     {icon && <Icon name={icon} size={16} color={error ? danger : muted} />}
                     {label && (
                       <Text
@@ -513,22 +440,10 @@ export const GroupedInputItem = forwardRef<TextInput, GroupedInputItemProps>(
             </>
           ) : (
             // Input Layout (Row)
-            <View
-              style={{
-                flex: 1,
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 8,
-              }}
-            >
+            <View style={styles.itemRow}>
               {/* Icon & Label */}
               <View
-                style={{
-                  width: label ? 120 : "auto",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 8,
-                }}
+                style={[styles.rowLeft, label ? styles.rowLeftLabelled : styles.rowLeftAuto]}
                 pointerEvents="none"
               >
                 {icon && <Icon name={icon} size={16} color={error ? danger : muted} />}
@@ -552,7 +467,7 @@ export const GroupedInputItem = forwardRef<TextInput, GroupedInputItemProps>(
               </View>
 
               {/* Input */}
-              <View style={{ flex: 1 }}>
+              <View style={styles.inputSlot}>
                 <TextInput
                   ref={ref}
                   style={withGeistFont([
@@ -585,3 +500,92 @@ export const GroupedInputItem = forwardRef<TextInput, GroupedInputItemProps>(
     return renderItemContent()
   },
 )
+
+GroupedInputItem.displayName = "GroupedInputItem"
+
+const styles = StyleSheet.create({
+  errorText: {
+    fontSize: CONTROL_FONT_SIZE,
+    marginLeft: 14,
+    marginTop: 4,
+  },
+  group: {
+    borderRadius: RADIUS["3xl"],
+    borderWidth: 1,
+    overflow: "hidden",
+  },
+  groupErrorSpaced: {
+    marginTop: 1,
+  },
+  groupErrorText: {
+    fontSize: CONTROL_FONT_SIZE,
+    marginLeft: 8,
+  },
+  groupErrors: {
+    marginTop: 6,
+  },
+  groupRow: {
+    justifyContent: "center",
+    minHeight: HEIGHT,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  groupRowDivided: {
+    borderBottomWidth: 1,
+  },
+  groupTitle: {
+    marginBottom: 8,
+    marginLeft: 8,
+  },
+  headerLeft: {
+    alignItems: "center",
+    flex: 1,
+    flexDirection: "row",
+    gap: 8,
+  },
+  headerRow: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 8,
+    marginBottom: 8,
+  },
+  inputSlot: {
+    flex: 1,
+  },
+  itemBody: {
+    backgroundColor: TRANSPARENT,
+  },
+  itemBodyColumn: {
+    alignItems: "stretch",
+    flexDirection: "column",
+  },
+  itemBodyRow: {
+    alignItems: "center",
+    flexDirection: "row",
+  },
+  itemRow: {
+    alignItems: "center",
+    flex: 1,
+    flexDirection: "row",
+    gap: 8,
+  },
+  pressableDisabled: {
+    opacity: 0.6,
+  },
+  row: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 8,
+  },
+  rowLeft: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 8,
+  },
+  rowLeftAuto: {
+    width: "auto",
+  },
+  rowLeftLabelled: {
+    width: 120,
+  },
+})

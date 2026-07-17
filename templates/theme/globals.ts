@@ -15,5 +15,14 @@ export const HEIGHT = 44
 export const FONT_SIZE = 16
 export const CONTROL_FONT_SIZE = 14
 
+/**
+ * Scrims behind modal surfaces. Not `useColor` keys: a scrim is the same ink in both
+ * schemes (it dims whatever is under it), so resolving it per-scheme would invert it.
+ */
+export const OVERLAY = { light: "rgba(0, 0, 0, 0.5)", strong: "rgba(0, 0, 0, 0.8)" } as const
+
+/** Named so style objects carry no colour literal; `transparent` has no palette token. */
+export const TRANSPARENT = "transparent"
+
 /** @deprecated use RADIUS */
 export const BORDER_RADIUS = RADIUS["4xl"]

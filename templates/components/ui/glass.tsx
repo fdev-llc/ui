@@ -56,7 +56,7 @@ export function GlassSurface({
     <BlurView
       intensity={intensity ?? TIER_INTENSITY[tier]}
       tint={isDark ? "dark" : "light"}
-      style={[{ overflow: "hidden" }, style]}
+      style={[styles.blur, style]}
       {...rest}
     >
       <View
@@ -67,3 +67,9 @@ export function GlassSurface({
     </BlurView>
   )
 }
+
+const styles = StyleSheet.create({
+  blur: {
+    overflow: "hidden",
+  },
+})

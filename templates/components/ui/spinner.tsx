@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react"
+import { memo, useEffect, useMemo } from "react"
 import { ActivityIndicator, StyleSheet, View, ViewStyle } from "react-native"
 import { Loader2 } from "lucide-react-native"
 import Animated, {
@@ -14,7 +14,8 @@ import Animated, {
 
 import { Text } from "@/components/ui/text"
 import { useColor } from "@/hooks/useColor"
-import { CORNERS, FONT_SIZE, RADIUS } from "@/theme/globals"
+import { withAlpha } from "@/theme/colorUtils"
+import { CORNERS, FONT_SIZE, RADIUS, TRANSPARENT } from "@/theme/globals"
 
 // Types
 type SpinnerSize = "default" | "sm" | "lg" | "icon"
@@ -76,7 +77,7 @@ interface AnimatedShapeProps {
   style: ViewStyle
 }
 
-const AnimatedDot = React.memo(({ anim, color, size, style }: AnimatedShapeProps) => {
+const AnimatedDot = memo(({ anim, color, size, style }: AnimatedShapeProps) => {
   const animatedStyle = useAnimatedStyle(() => ({
     opacity: anim.value,
   }))
@@ -87,7 +88,7 @@ const AnimatedDot = React.memo(({ anim, color, size, style }: AnimatedShapeProps
   )
 })
 
-const AnimatedBar = React.memo(({ anim, color, size, style }: AnimatedShapeProps) => {
+const AnimatedBar = memo(({ anim, color, size, style }: AnimatedShapeProps) => {
   const animatedStyle = useAnimatedStyle(() => ({
     opacity: anim.value,
   }))
@@ -97,6 +98,9 @@ const AnimatedBar = React.memo(({ anim, color, size, style }: AnimatedShapeProps
     />
   )
 })
+
+AnimatedDot.displayName = "AnimatedDot"
+AnimatedBar.displayName = "AnimatedBar"
 
 // Main Spinner Component
 export function Spinner({
@@ -334,17 +338,13 @@ export function LoadingOverlay({
     display: opacity.value === 0 ? "none" : "flex",
   }))
 
-  const defaultBackdropColor =
-    backdropColor ||
-    `${backgroundColor}${Math.round(backdropOpacity * 255)
-      .toString(16)
-      .padStart(2, "0")}`
+  const defaultBackdropColor = backdropColor || withAlpha(backgroundColor, backdropOpacity)
 
   return (
     <Animated.View
       style={[
         styles.overlay,
-        { backgroundColor: backdrop ? defaultBackdropColor : "transparent" },
+        { backgroundColor: backdrop ? defaultBackdropColor : TRANSPARENT },
         animatedOverlayStyle,
       ]}
       pointerEvents={visible ? "auto" : "none"}

@@ -1,4 +1,5 @@
-import React, { forwardRef } from "react"
+import { forwardRef } from "react"
+import type { ReactNode } from "react"
 import { Text as RNText, TextProps as RNTextProps, TextStyle } from "react-native"
 
 import { useColor } from "@/hooks/useColor"
@@ -11,7 +12,7 @@ interface TextProps extends RNTextProps {
   variant?: TextVariant
   lightColor?: string
   darkColor?: string
-  children: React.ReactNode
+  children: ReactNode
 }
 
 export const Text = forwardRef<RNText, TextProps>(
@@ -73,3 +74,5 @@ export const Text = forwardRef<RNText, TextProps>(
     )
   },
 )
+
+Text.displayName = "Text"

@@ -1,4 +1,5 @@
-import React, { useEffect } from "react"
+import { useCallback, useEffect, useState } from "react"
+import type { ReactNode } from "react"
 import {
   Modal,
   ScrollView,
@@ -21,10 +22,10 @@ import { Text } from "@/components/ui/text"
 import { View } from "@/components/ui/view"
 import { useColor } from "@/hooks/useColor"
 import { useKeyboardHeight } from "@/hooks/useKeyboardHeight" // Make sure this path is correct
-import { RADIUS } from "@/theme/globals"
+import { CORNERS, OVERLAY, RADIUS } from "@/theme/globals"
 
 type BottomSheetContentProps = {
-  children: React.ReactNode
+  children: ReactNode
   title?: string
   style?: ViewStyle
   rBottomSheetStyle: any
@@ -46,52 +47,21 @@ const BottomSheetContent = ({
 
   return (
     <Animated.View
-      style={[
-        {
-          height: screenHeight,
-          width: "100%",
-          position: "absolute",
-          top: screenHeight,
-          borderTopLeftRadius: RADIUS["4xl"],
-          borderTopRightRadius: RADIUS["4xl"],
-          overflow: "hidden",
-        },
-        rBottomSheetStyle,
-        style,
-      ]}
+      style={[styles.sheet, { height: screenHeight, top: screenHeight }, rBottomSheetStyle, style]}
     >
       <GlassSurface tier="strong" style={StyleSheet.absoluteFill} />
 
       {/* Handle */}
       <TouchableWithoutFeedback accessibilityRole="button" onPress={onHandlePress}>
-        <View
-          style={{
-            width: "100%",
-            paddingVertical: 12,
-            alignItems: "center",
-          }}
-        >
-          <View
-            style={{
-              width: 64,
-              height: 6,
-              backgroundColor: mutedColor,
-              borderRadius: 999,
-            }}
-          />
+        <View style={styles.handleArea}>
+          <View style={[styles.handleBar, { backgroundColor: mutedColor }]} />
         </View>
       </TouchableWithoutFeedback>
 
       {/* Title */}
       {title && (
-        <View
-          style={{
-            marginHorizontal: 16,
-            marginTop: 16,
-            paddingBottom: 8,
-          }}
-        >
-          <Text variant="title" style={{ textAlign: "center" }}>
+        <View style={styles.titleArea}>
+          <Text variant="title" style={styles.titleText}>
             {title}
           </Text>
         </View>
@@ -99,8 +69,8 @@ const BottomSheetContent = ({
 
       {/* Content now wrapped in a ScrollView */}
       <ScrollView
-        style={{ flex: 1 }}
-        contentContainerStyle={{ padding: 16, paddingBottom: 40 }}
+        style={styles.scroll}
+        contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
@@ -113,7 +83,7 @@ const BottomSheetContent = ({
 type BottomSheetProps = {
   isVisible: boolean
   onClose: () => void
-  children: React.ReactNode
+  children: ReactNode
   snapPoints?: number[]
   enableBackdropDismiss?: boolean
   title?: string
@@ -146,7 +116,7 @@ export function BottomSheet({
   const snapPointsHeights = snapPoints.map((point) => -screenHeight * point)
   const defaultHeight = snapPointsHeights[0]
 
-  const [modalVisible, setModalVisible] = React.useState(false)
+  const [modalVisible, setModalVisible] = useState(false)
 
   // Effect to handle opening and closing the bottom sheet
   useEffect(() => {
@@ -281,31 +251,33 @@ export function BottomSheet({
 
   return (
     <Modal visible={modalVisible} transparent statusBarTranslucent animationType="none">
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <Animated.View style={[{ flex: 1, backgroundColor: "rgba(0, 0, 0, 0.8)" }, rBackdropStyle]}>
+      <GestureHandlerRootView style={styles.root}>
+        <Animated.View style={[styles.backdrop, rBackdropStyle]}>
           <TouchableWithoutFeedback accessibilityRole="button" onPress={handleBackdropPress}>
-            <Animated.View style={{ flex: 1 }} />
+            <Animated.View style={styles.backdropTouchableArea} />
           </TouchableWithoutFeedback>
 
           {disablePanGesture ? (
             <BottomSheetContent
-              children={children}
               title={title}
               style={style}
               rBottomSheetStyle={rBottomSheetStyle}
               mutedColor={mutedColor}
               onHandlePress={() => runOnJS(handlePress)()}
-            />
+            >
+              {children}
+            </BottomSheetContent>
           ) : (
             <GestureDetector gesture={gesture}>
               <BottomSheetContent
-                children={children}
                 title={title}
                 style={style}
                 rBottomSheetStyle={rBottomSheetStyle}
                 mutedColor={mutedColor}
                 onHandlePress={() => runOnJS(handlePress)()}
-              />
+              >
+                {children}
+              </BottomSheetContent>
             </GestureDetector>
           )}
         </Animated.View>
@@ -316,17 +288,17 @@ export function BottomSheet({
 
 // Hook for managing bottom sheet state
 export function useBottomSheet() {
-  const [isVisible, setIsVisible] = React.useState(false)
+  const [isVisible, setIsVisible] = useState(false)
 
-  const open = React.useCallback(() => {
+  const open = useCallback(() => {
     setIsVisible(true)
   }, [])
 
-  const close = React.useCallback(() => {
+  const close = useCallback(() => {
     setIsVisible(false)
   }, [])
 
-  const toggle = React.useCallback(() => {
+  const toggle = useCallback(() => {
     setIsVisible((prev) => !prev)
   }, [])
 
@@ -337,3 +309,48 @@ export function useBottomSheet() {
     toggle,
   }
 }
+
+const styles = StyleSheet.create({
+  backdrop: {
+    backgroundColor: OVERLAY.strong,
+    flex: 1,
+  },
+  backdropTouchableArea: {
+    flex: 1,
+  },
+  handleArea: {
+    alignItems: "center",
+    paddingVertical: 12,
+    width: "100%",
+  },
+  handleBar: {
+    borderRadius: CORNERS,
+    height: 6,
+    width: 64,
+  },
+  root: {
+    flex: 1,
+  },
+  scroll: {
+    flex: 1,
+  },
+  scrollContent: {
+    padding: 16,
+    paddingBottom: 40,
+  },
+  sheet: {
+    borderTopLeftRadius: RADIUS["4xl"],
+    borderTopRightRadius: RADIUS["4xl"],
+    overflow: "hidden",
+    position: "absolute",
+    width: "100%",
+  },
+  titleArea: {
+    marginHorizontal: 16,
+    marginTop: 16,
+    paddingBottom: 8,
+  },
+  titleText: {
+    textAlign: "center",
+  },
+})
