@@ -41,9 +41,14 @@ function useReduceTransparency(): boolean | null {
     let active = true
 
     // The listener alone would never fire for someone who had the setting ON before mount.
-    AccessibilityInfo.isReduceTransparencyEnabled().then((enabled) => {
-      if (active) setReduceTransparency(enabled)
-    })
+    AccessibilityInfo.isReduceTransparencyEnabled()
+      .then((enabled) => {
+        if (active) setReduceTransparency(enabled)
+      })
+      // RN rejects this when the iOS accessibility manager is unavailable. Swallowing it
+      // leaves the state `null`, which is the opaque card — if we cannot find out whether
+      // the user asked to reduce transparency, we do not get to assume they did not.
+      .catch(() => {})
 
     const subscription = AccessibilityInfo.addEventListener(
       "reduceTransparencyChanged",
