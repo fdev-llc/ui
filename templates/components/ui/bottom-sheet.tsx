@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useContext, useEffect, useRef, useState } from "react"
 import type { ReactNode } from "react"
 import {
   Modal,
@@ -16,6 +16,7 @@ import Animated, {
   withSpring,
   withTiming,
 } from "react-native-reanimated"
+import { SafeAreaInsetsContext } from "react-native-safe-area-context"
 
 import { GlassSurface } from "@/components/ui/glass"
 import { Text } from "@/components/ui/text"
@@ -24,13 +25,17 @@ import { useColor } from "@/hooks/useColor"
 import { useKeyboardHeight } from "@/hooks/useKeyboardHeight" // Make sure this path is correct
 import { CORNERS, OVERLAY, RADIUS } from "@/theme/globals"
 
+const DEFAULT_SNAP_POINTS = [0.3, 0.6, 0.9]
+
 type BottomSheetContentProps = {
   children: ReactNode
   title?: string
   accessibilityHint?: string
   style?: ViewStyle
   rBottomSheetStyle: any
+  rContentStyle: any
   mutedColor: string
+  bottomInset: number
   onHandlePress?: () => void
 }
 
@@ -42,7 +47,9 @@ const BottomSheetContent = ({
   accessibilityHint,
   style,
   rBottomSheetStyle,
+  rContentStyle,
   mutedColor,
+  bottomInset,
   onHandlePress,
 }: BottomSheetContentProps) => {
   const { height: screenHeight } = useWindowDimensions()
@@ -63,31 +70,37 @@ const BottomSheetContent = ({
     >
       <GlassSurface tier="strong" style={StyleSheet.absoluteFill} />
 
-      {/* Handle */}
-      <TouchableWithoutFeedback accessibilityRole="button" onPress={onHandlePress}>
-        <View style={styles.handleArea}>
-          <View style={[styles.handleBar, { backgroundColor: mutedColor }]} />
-        </View>
-      </TouchableWithoutFeedback>
+      {/* Keep the scrolling viewport inside the visible extent, including its chrome. */}
+      <Animated.View style={[styles.content, rContentStyle]}>
+        {/* Handle */}
+        <TouchableWithoutFeedback accessibilityRole="button" onPress={onHandlePress}>
+          <View style={styles.handleArea}>
+            <View style={[styles.handleBar, { backgroundColor: mutedColor }]} />
+          </View>
+        </TouchableWithoutFeedback>
 
-      {/* Title */}
-      {title && (
-        <View style={styles.titleArea}>
-          <Text variant="title" style={styles.titleText}>
-            {title}
-          </Text>
-        </View>
-      )}
+        {/* Title */}
+        {title && (
+          <View style={styles.titleArea}>
+            <Text variant="title" style={styles.titleText}>
+              {title}
+            </Text>
+          </View>
+        )}
 
-      {/* Content now wrapped in a ScrollView */}
-      <ScrollView
-        style={styles.scroll}
-        contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
-      >
-        {children}
-      </ScrollView>
+        {/* Content now wrapped in a ScrollView */}
+        <ScrollView
+          style={styles.scroll}
+          contentContainerStyle={[
+            styles.scrollContent,
+            { paddingBottom: Math.max(styles.scrollContent.paddingBottom, bottomInset) },
+          ]}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          {children}
+        </ScrollView>
+      </Animated.View>
     </Animated.View>
   )
 }
@@ -109,7 +122,7 @@ export function BottomSheet({
   isVisible,
   onClose,
   children,
-  snapPoints = [0.3, 0.6, 0.9],
+  snapPoints = DEFAULT_SNAP_POINTS,
   enableBackdropDismiss = true,
   title,
   accessibilityHint,
@@ -120,6 +133,8 @@ export function BottomSheet({
   const { height: screenHeight } = useWindowDimensions()
   const maxTranslateY = -screenHeight + 50
   const { keyboardHeight, isKeyboardVisible } = useKeyboardHeight()
+  const insets = useContext(SafeAreaInsetsContext)
+  const bottomInset = isKeyboardVisible ? 0 : (insets?.bottom ?? 0)
 
   const translateY = useSharedValue(0)
   const context = useSharedValue({ y: 0 })
@@ -129,20 +144,25 @@ export function BottomSheet({
   const keyboardHeightSV = useSharedValue(0)
 
   const snapPointsHeights = snapPoints.map((point) => -screenHeight * point)
+  // Callers can supply fresh inline arrays; only changed values should interrupt a pan.
+  const snapPointsKey = snapPoints.join(",")
   const defaultHeight = snapPointsHeights[0]
 
   const [modalVisible, setModalVisible] = useState(false)
+  const wasVisible = useRef(false)
 
   // Effect to handle opening and closing the bottom sheet
   useEffect(() => {
     if (isVisible) {
-      setModalVisible(true)
-      translateY.value = withSpring(defaultHeight, {
-        damping: 50,
-        stiffness: 400,
-      })
-      opacity.value = withTiming(1, { duration: 300 })
-      currentSnapIndex.value = 0
+      if (!wasVisible.current) {
+        setModalVisible(true)
+        translateY.value = withSpring(defaultHeight, {
+          damping: 50,
+          stiffness: 400,
+        })
+        opacity.value = withTiming(1, { duration: 300 })
+        currentSnapIndex.value = 0
+      }
     } else {
       translateY.value = withSpring(0, { damping: 50, stiffness: 400 })
       opacity.value = withTiming(0, { duration: 300 }, (finished) => {
@@ -151,6 +171,7 @@ export function BottomSheet({
         }
       })
     }
+    wasVisible.current = isVisible
   }, [isVisible, defaultHeight])
 
   // Function to animate the sheet to a specific destination
@@ -162,10 +183,14 @@ export function BottomSheet({
   // --- START: NEW KEYBOARD HANDLING LOGIC ---
   useEffect(() => {
     // Update the shared value whenever keyboardHeight changes
-    keyboardHeightSV.value = keyboardHeight
+    keyboardHeightSV.value = isKeyboardVisible ? keyboardHeight : 0
 
     // Only adjust position if the sheet is currently visible
     if (isVisible) {
+      // A removed snap returns to the first remaining snap before reading its height.
+      if (currentSnapIndex.value >= snapPointsHeights.length) {
+        currentSnapIndex.value = 0
+      }
       const currentSnapHeight = snapPointsHeights[currentSnapIndex.value]
       let destination: number
 
@@ -178,7 +203,7 @@ export function BottomSheet({
       }
       scrollTo(destination)
     }
-  }, [keyboardHeight, isKeyboardVisible, isVisible])
+  }, [keyboardHeight, isKeyboardVisible, isVisible, screenHeight, snapPointsKey])
   // --- END: NEW KEYBOARD HANDLING LOGIC ---
 
   const findClosestSnapPoint = (currentY: number) => {
@@ -252,6 +277,15 @@ export function BottomSheet({
     }
   })
 
+  // Container height - animated top - keyboard overlap (Paseo's visible-content
+  // geometry). Flex layout deducts the actual handle/title sizes from the scroller.
+  const rContentStyle = useAnimatedStyle(() => ({
+    height: Math.max(0, -translateY.value - keyboardHeightSV.value),
+    // A tall snap shifted above the window by the keyboard still needs its
+    // handle/title and the start of its scroller inside the visible region.
+    paddingTop: Math.max(0, -screenHeight - translateY.value),
+  }))
+
   const rBackdropStyle = useAnimatedStyle(() => {
     return {
       opacity: opacity.value,
@@ -278,7 +312,9 @@ export function BottomSheet({
               accessibilityHint={accessibilityHint}
               style={style}
               rBottomSheetStyle={rBottomSheetStyle}
+              rContentStyle={rContentStyle}
               mutedColor={mutedColor}
+              bottomInset={bottomInset}
               onHandlePress={() => runOnJS(handlePress)()}
             >
               {children}
@@ -290,7 +326,9 @@ export function BottomSheet({
                 accessibilityHint={accessibilityHint}
                 style={style}
                 rBottomSheetStyle={rBottomSheetStyle}
+                rContentStyle={rContentStyle}
                 mutedColor={mutedColor}
+                bottomInset={bottomInset}
                 onHandlePress={() => runOnJS(handlePress)()}
               >
                 {children}
@@ -334,6 +372,10 @@ const styles = StyleSheet.create({
   },
   backdropTouchableArea: {
     flex: 1,
+  },
+  content: {
+    maxHeight: "100%",
+    overflow: "hidden",
   },
   handleArea: {
     alignItems: "center",
